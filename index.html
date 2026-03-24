@@ -3,25 +3,23 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>파이썬 퀴즈</title>
+  <title>파이썬 기초 퀴즈</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <main class="page">
-    <div class="app-header">
-      <h1>파이썬 퀴즈</h1>
-      <p>문제를 읽고 정답을 입력한 뒤 제출하세요.</p>
+  <div class="quiz-wrapper">
+    <h1>파이썬 기초 퀴즈</h1>
+
+    <div id="quiz-container"></div>
+
+    <div class="button-group">
+      <button onclick="submitQuiz()">제출하기</button>
+      <button onclick="showAnswers()">정답보기</button>
+      <button onclick="resetQuiz()">다시 풀기</button>
     </div>
 
-    <section id="quiz-container" class="quiz-container"></section>
-
-    <div class="button-row">
-      <button id="submit-btn" type="button">제출하기</button>
-      <button id="retry-btn" type="button">다시 풀기</button>
-    </div>
-
-    <section id="result-panel" class="result-panel hidden" aria-live="polite"></section>
-  </main>
+    <div id="result"></div>
+  </div>
 
   <script src="script.js"></script>
 </body>

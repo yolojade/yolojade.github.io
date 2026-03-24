@@ -1,119 +1,142 @@
 let quizData = [];
+let submitted = false;
 
-async function loadQuiz() {
-  try {
-    const response = await fetch('quiz.txt');
-    const text = await response.text();
+fetch("quiz.txt")
+  .then((response) => {
+    if (!response.ok) {
+      throw new Error("quiz.txt 파일을 불러오지 못했습니다.");
+    }
+    return response.text();
+  })
+  .then((text) => {
+    const normalizedText = text.replace(/\r/g, "").trim();
+    const blocks = normalizedText.split(/\n\s*\n/).filter(Boolean);
 
-    quizData = text
-      .trim()
-      .split('\n\n')
-      .map((block) => {
-        const lines = block.split('\n');
-        const number = lines[0].trim();
-        const answer = lines[lines.length - 1].trim();
-        const code = lines.slice(1, -1).join('\n').trim();
-        return { number, code, answer };
-      })
-      .filter((item) => item.number && item.code && item.answer);
+    quizData = blocks.map((block) => {
+      const lines = block.split("\n");
+      const number = lines[0].trim();
+      const separatorIndex = lines.indexOf("===");
+
+      if (separatorIndex === -1) {
+        throw new Error("각 문제에는 반드시 === 구분자가 있어야 합니다.");
+      }
+
+      const question = lines.slice(1, separatorIndex).join("\n").trim();
+      const answer = lines.slice(separatorIndex + 1).join("\n").trim();
+
+      return {
+        number,
+        question,
+        answer,
+        isCorrect: false,
+      };
+    });
 
     renderQuiz();
-  } catch (error) {
-    document.getElementById('quiz-container').innerHTML = '<p>문제를 불러오지 못했습니다.</p>';
-    console.error(error);
-  }
-}
+  })
+  .catch((error) => {
+    document.getElementById("result").innerText = `오류: ${error.message}`;
+  });
 
 function renderQuiz() {
-  const container = document.getElementById('quiz-container');
-  container.innerHTML = '';
+  const container = document.getElementById("quiz-container");
+  container.innerHTML = "";
 
   quizData.forEach((item, index) => {
-    const card = document.createElement('section');
-    card.className = 'quiz-card';
-    card.innerHTML = `
-      <div class="quiz-number">${escapeHtml(item.number)}</div>
-      <div class="code-area">
-        <pre class="code-block">${escapeHtml(item.code)}</pre>
-      </div>
-      <div class="answer-area">
-        <div class="answer-label">정답</div>
-        <div class="answer-input-wrap">
-          <input
-            type="text"
-            class="answer-input"
-            id="answer-${index}"
-            placeholder="정답을 입력하세요"
-            autocomplete="off"
-          />
-        </div>
-        <div class="feedback" id="feedback-${index}"></div>
-      </div>
+    const box = document.createElement("div");
+    box.className = "question-box";
+
+    box.innerHTML = `
+      <div class="number-box">${escapeHtml(item.number)}</div>
+      <pre>${escapeHtml(item.question)}</pre>
+      <div class="answer-label">정답</div>
+      <textarea id="answer-${index}" placeholder="정답을 입력하세요"></textarea>
+      <div id="feedback-${index}" class="feedback"></div>
+      <div id="correct-answer-${index}" class="correct-answer"></div>
     `;
-    container.appendChild(card);
+
+    container.appendChild(box);
   });
 }
 
 function normalize(text) {
-  return text.replace(/\s+/g, '').toLowerCase();
+  return text
+    .replace(/\r/g, "")
+    .trim()
+    .replace(/\s+/g, "")
+    .toLowerCase();
 }
 
 function submitQuiz() {
-  let correctCount = 0;
+  if (quizData.length === 0) {
+    document.getElementById("result").innerText = "문제가 없습니다.";
+    return;
+  }
+
+  let correct = 0;
+  submitted = true;
 
   quizData.forEach((item, index) => {
     const input = document.getElementById(`answer-${index}`);
     const feedback = document.getElementById(`feedback-${index}`);
-    const userAnswer = input.value.trim();
-    const isCorrect = normalize(userAnswer) === normalize(item.answer);
+    const correctAnswerBox = document.getElementById(`correct-answer-${index}`);
 
-    input.classList.remove('correct', 'wrong');
-    feedback.classList.remove('correct', 'wrong');
+    const userAnswer = normalize(input.value);
+    const correctAnswer = normalize(item.answer);
 
-    if (isCorrect) {
-      correctCount += 1;
-      input.classList.add('correct');
-      feedback.classList.add('correct');
-      feedback.textContent = '정답입니다.';
+    if (userAnswer === correctAnswer) {
+      item.isCorrect = true;
+      correct += 1;
+      feedback.innerText = "✅ 정답";
+      feedback.style.color = "green";
     } else {
-      input.classList.add('wrong');
-      feedback.classList.add('wrong');
-      feedback.textContent = `오답입니다. 정답: ${item.answer}`;
+      item.isCorrect = false;
+      feedback.innerText = "❌ 오답";
+      feedback.style.color = "red";
     }
+
+    correctAnswerBox.innerText = "";
   });
 
-  const score = Math.round((correctCount / quizData.length) * 100);
-  const resultPanel = document.getElementById('result-panel');
-  resultPanel.classList.remove('hidden');
-  resultPanel.textContent = `총 ${quizData.length}문제 중 ${correctCount}문제 정답 / 점수 ${score}점`;
+  const score = Math.round((correct / quizData.length) * 100);
+  document.getElementById("result").innerText = `점수: ${score}점 (${correct}/${quizData.length} 정답)`;
+}
+
+function showAnswers() {
+  if (!submitted) {
+    document.getElementById("result").innerText = "먼저 제출하기를 눌러주세요.";
+    return;
+  }
+
+  quizData.forEach((item, index) => {
+    const correctAnswerBox = document.getElementById(`correct-answer-${index}`);
+
+    if (!item.isCorrect) {
+      correctAnswerBox.innerText = `정답:\n${item.answer}`;
+    } else {
+      correctAnswerBox.innerText = "";
+    }
+  });
 }
 
 function resetQuiz() {
-  quizData.forEach((_, index) => {
-    const input = document.getElementById(`answer-${index}`);
-    const feedback = document.getElementById(`feedback-${index}`);
+  submitted = false;
 
-    input.value = '';
-    input.classList.remove('correct', 'wrong');
-    feedback.textContent = '';
-    feedback.classList.remove('correct', 'wrong');
+  quizData.forEach((item, index) => {
+    item.isCorrect = false;
+    document.getElementById(`answer-${index}`).value = "";
+    document.getElementById(`feedback-${index}`).innerText = "";
+    document.getElementById(`correct-answer-${index}`).innerText = "";
   });
 
-  const resultPanel = document.getElementById('result-panel');
-  resultPanel.textContent = '';
-  resultPanel.classList.add('hidden');
+  document.getElementById("result").innerText = "";
 }
 
 function escapeHtml(text) {
   return text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/\"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 }
-
-document.getElementById('submit-btn').addEventListener('click', submitQuiz);
-document.getElementById('retry-btn').addEventListener('click', resetQuiz);
-
-loadQuiz();
