@@ -22,7 +22,10 @@ fetch("quiz.txt")
       }
 
       const question = lines.slice(1, separatorIndex).join("\n").trim();
-      const answer = lines.slice(separatorIndex + 1).join("\n").trim();
+      const answer = lines
+        .slice(separatorIndex + 1)
+        .join("\n")
+        .trim();
 
       return {
         number,
@@ -60,11 +63,7 @@ function renderQuiz() {
 }
 
 function normalize(text) {
-  return text
-    .replace(/\r/g, "")
-    .trim()
-    .replace(/\s+/g, "")
-    .toLowerCase();
+  return text.replace(/\r/g, "").trim().replace(/\s+/g, "").toLowerCase();
 }
 
 function submitQuiz() {
@@ -99,7 +98,8 @@ function submitQuiz() {
   });
 
   const score = Math.round((correct / quizData.length) * 100);
-  document.getElementById("result").innerText = `점수: ${score}점 (${correct}/${quizData.length} 정답)`;
+  document.getElementById("result").innerText =
+    `점수: ${score}점 (${correct}/${quizData.length} 정답)`;
 }
 
 function showAnswers() {
@@ -137,6 +137,6 @@ function escapeHtml(text) {
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
-    .replace(/\"/g, "&quot;")
+    .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
 }
