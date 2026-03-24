@@ -18,18 +18,18 @@ a[1]
 
 4
 a = ["가", "나", "다"]
-print(b[1])
+print(a[1])
 ===
 NameError
 
 5
 a = ['가', 1, 'A']
-print(b[1], b[0])
+print(a[1], a[0])
 ===
 NameError
 
 6
-a = [5, 10, 15, 20]
+c = [5, 10, 15, 20]
 print(c[3] + c[0] - c[1])
 ===
 NameError
