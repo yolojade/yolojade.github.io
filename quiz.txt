@@ -20,19 +20,19 @@ a[1]
 a = ["가", "나", "다"]
 print(a[1])
 ===
-NameError
+나
 
 5
 a = ['가', 1, 'A']
 print(a[1], a[0])
 ===
-NameError
+1 가
 
 6
 c = [5, 10, 15, 20]
 print(c[3] + c[0] - c[1])
 ===
-NameError
+15
 
 7
 a = [1, 2]
