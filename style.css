@@ -1,0 +1,156 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, "Malgun Gothic", sans-serif;
+  background: #f4f4f4;
+  color: #111;
+}
+
+.page {
+  max-width: 860px;
+  margin: 32px auto;
+  padding: 0 16px 40px;
+}
+
+.app-header h1 {
+  margin: 0 0 8px;
+  font-size: 32px;
+}
+
+.app-header p {
+  margin: 0 0 24px;
+  color: #444;
+}
+
+.quiz-container {
+  display: grid;
+  gap: 20px;
+}
+
+.quiz-card {
+  border: 2px solid #333;
+  background: #fff;
+}
+
+.quiz-number {
+  display: inline-block;
+  min-width: 42px;
+  padding: 8px 14px;
+  border-right: 2px solid #d9d9d9;
+  border-bottom: 2px solid #d9d9d9;
+  font-size: 30px;
+  line-height: 1;
+}
+
+.code-area {
+  min-height: 156px;
+  padding: 18px 16px 8px;
+  border-bottom: 2px solid #333;
+}
+
+.code-block {
+  margin: 0;
+  font-family: Consolas, Monaco, monospace;
+  font-size: 34px;
+  line-height: 1.45;
+  white-space: pre-wrap;
+}
+
+.answer-area {
+  padding: 0;
+}
+
+.answer-label {
+  display: inline-block;
+  padding: 6px 12px;
+  margin: 10px 0 8px 12px;
+  background: #ededed;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.answer-input-wrap {
+  padding: 0 12px 14px;
+}
+
+.answer-input {
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid #bbb;
+  font-size: 28px;
+}
+
+.answer-input.correct {
+  border: 3px solid #1b8a3b;
+  background: #effaf2;
+}
+
+.answer-input.wrong {
+  border: 3px solid #c62828;
+  background: #fff1f1;
+}
+
+.feedback {
+  padding: 0 12px 12px;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.feedback.correct {
+  color: #1b8a3b;
+}
+
+.feedback.wrong {
+  color: #c62828;
+}
+
+.button-row {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+button {
+  padding: 14px 22px;
+  border: none;
+  background: #222;
+  color: #fff;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+.result-panel {
+  margin-top: 20px;
+  padding: 18px;
+  background: #fff;
+  border: 2px solid #333;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.hidden {
+  display: none;
+}
+
+@media (max-width: 700px) {
+  .quiz-number {
+    font-size: 22px;
+  }
+
+  .code-block {
+    font-size: 22px;
+  }
+
+  .answer-label,
+  .answer-input,
+  .feedback {
+    font-size: 20px;
+  }
+}
