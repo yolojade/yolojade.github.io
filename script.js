@@ -1,5 +1,12 @@
+const SCRIPT_URL =
+  "https://script.google.com/macros/s/AKfycbzSmFxCQrjUVKcmq71o1C0d3sohaPRmf6qzRUug63eXJbB5Sg6BzHKdvRyyLpQWc4T5/exec";
+
 let quizData = [];
 let submitted = false;
+let currentStudent = {
+  studentId: "",
+  studentName: "",
+};
 
 fetch("quiz.txt")
   .then((response) => {
@@ -34,12 +41,28 @@ fetch("quiz.txt")
         isCorrect: false,
       };
     });
-
-    renderQuiz();
   })
   .catch((error) => {
     document.getElementById("result").innerText = `오류: ${error.message}`;
   });
+
+function startQuiz() {
+  const studentId = document.getElementById("student-id").value.trim();
+  const studentName = document.getElementById("student-name").value.trim();
+
+  if (!studentId || !studentName) {
+    alert("학번과 이름을 모두 입력하세요.");
+    return;
+  }
+
+  currentStudent.studentId = studentId;
+  currentStudent.studentName = studentName;
+
+  document.getElementById("start-section").style.display = "none";
+  document.getElementById("quiz-section").style.display = "block";
+
+  renderQuiz();
+}
 
 function renderQuiz() {
   const container = document.getElementById("quiz-container");
@@ -66,7 +89,7 @@ function normalize(text) {
   return text.replace(/\r/g, "").trim().replace(/\s+/g, "").toLowerCase();
 }
 
-function submitQuiz() {
+async function submitQuiz() {
   if (quizData.length === 0) {
     document.getElementById("result").innerText = "문제가 없습니다.";
     return;
@@ -74,6 +97,7 @@ function submitQuiz() {
 
   let correct = 0;
   submitted = true;
+  const wrongNumbers = [];
 
   quizData.forEach((item, index) => {
     const input = document.getElementById(`answer-${index}`);
@@ -90,6 +114,7 @@ function submitQuiz() {
       feedback.style.color = "green";
     } else {
       item.isCorrect = false;
+      wrongNumbers.push(item.number);
       feedback.innerText = "❌ 오답";
       feedback.style.color = "red";
     }
@@ -97,9 +122,43 @@ function submitQuiz() {
     correctAnswerBox.innerText = "";
   });
 
-  const score = Math.round((correct / quizData.length) * 100);
+  const totalCount = quizData.length;
+  const score = Math.round((correct / totalCount) * 100);
+
   document.getElementById("result").innerText =
-    `점수: ${score}점 (${correct}/${quizData.length} 정답)`;
+    `점수: ${score}점 (${correct}/${totalCount} 정답)\n제출 기록 저장 중...`;
+
+  try {
+    const payload = {
+      studentId: currentStudent.studentId,
+      studentName: currentStudent.studentName,
+      score,
+      correctCount: correct,
+      totalCount,
+      wrongNumbers,
+    };
+
+    const response = await fetch(SCRIPT_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "text/plain;charset=utf-8",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const result = await response.json();
+
+    if (result.success) {
+      document.getElementById("result").innerText =
+        `점수: ${score}점 (${correct}/${totalCount} 정답)\n제출 기록이 저장되었습니다.`;
+    } else {
+      document.getElementById("result").innerText =
+        `점수: ${score}점 (${correct}/${totalCount} 정답)\n기록 저장 실패: ${result.message}`;
+    }
+  } catch (error) {
+    document.getElementById("result").innerText =
+      `점수: ${score}점 (${correct}/${totalCount} 정답)\n기록 저장 실패: ${error.message}`;
+  }
 }
 
 function showAnswers() {
