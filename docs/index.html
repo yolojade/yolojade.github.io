@@ -1,167 +1,159 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>컴벤져스 출석체크</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <title>출석 시스템</title>
+  <style>
+    body { font-family: Arial; padding:20px; }
+    input, button { padding:8px; margin:5px; }
+    .card { border:1px solid #ddd; padding:10px; margin:10px 0; }
+  </style>
 </head>
 <body>
-  <div class="container">
-    <header class="hero">
-      <div>
-        <p class="eyebrow">QR 체크인 페이지</p>
-        <h1>출석체크 · 회원등록 · 잔여횟수 확인</h1>
-        <p class="sub">GitHub Pages 프론트엔드 + Google Sheets 저장 방식</p>
+
+<h2>🔧 API 설정</h2>
+<input id="apiUrl" placeholder="Apps Script URL (/exec까지)">
+<button onclick="saveApi()">저장</button>
+<button onclick="testApi()">연결 테스트</button>
+
+<hr>
+
+<h2>👤 회원 검색</h2>
+<input id="keyword" placeholder="이름 / ID / 전화번호">
+<button onclick="search()">검색</button>
+
+<div id="result"></div>
+
+<hr>
+
+<h2>➕ 회원 등록</h2>
+<input id="name" placeholder="이름"><br>
+<input id="phone" placeholder="전화번호"><br>
+<input id="course" placeholder="과정"><br>
+<input id="total" placeholder="총횟수"><br>
+<button onclick="register()">등록</button>
+
+<script>
+let API_URL = localStorage.getItem("api") || "";
+document.getElementById("apiUrl").value = API_URL;
+
+function saveApi(){
+  const url = document.getElementById("apiUrl").value.trim();
+  if(!url.includes("/exec")){
+    alert("잘못된 URL");
+    return;
+  }
+  API_URL = url;
+  localStorage.setItem("api", url);
+  alert("저장됨");
+}
+
+function jsonp(action, params={}){
+  return new Promise((resolve, reject)=>{
+    const cb = "cb_" + Date.now();
+    const url = new URL(API_URL);
+    url.searchParams.set("action", action);
+    url.searchParams.set("cb", cb);
+
+    Object.keys(params).forEach(k=>{
+      url.searchParams.set(k, params[k]);
+    });
+
+    window[cb] = function(data){
+      delete window[cb];
+      document.body.removeChild(script);
+      resolve(data);
+    }
+
+    const script = document.createElement("script");
+    script.src = url.toString();
+
+    script.onerror = function(){
+      reject("API 실패");
+    }
+
+    document.body.appendChild(script);
+  });
+}
+
+async function testApi(){
+  try{
+    await jsonp("health");
+    alert("API 연결 성공");
+  }catch(e){
+    alert("API 연결 실패");
+  }
+}
+
+async function search(){
+  const keyword = document.getElementById("keyword").value.trim();
+  if(!keyword){
+    alert("검색어 입력");
+    return;
+  }
+
+  try{
+    const res = await jsonp("findMembers",{keyword});
+    if(!res.success){
+      alert("검색 실패");
+      return;
+    }
+
+    const list = res.data.members;
+
+    const html = list.map(m=>`
+      <div class="card">
+        <b>${m.name}</b> (${m.memberId})<br>
+        잔여: <span id="remain_${m.memberId}">${m.remainingSessions}</span><br>
+        <button onclick="checkin('${m.memberId}')">출석</button>
       </div>
-      <button id="openSettingsBtn" class="secondary">환경설정</button>
-    </header>
+    `).join("");
 
-    <section class="card notice">
-      <strong>사용 순서</strong>
-      <ol>
-        <li>환경설정에서 Apps Script 웹앱 URL을 넣습니다.</li>
-        <li>회원등록 탭에서 회원을 등록합니다.</li>
-        <li>QR코드에는 이 페이지 주소를 넣습니다.</li>
-        <li>현장에서 회원 검색 후 출석체크를 누르면 시트에 기록됩니다.</li>
-      </ol>
-    </section>
+    document.getElementById("result").innerHTML = html;
 
-    <nav class="tabs">
-      <button class="tab active" data-tab="checkin">출석체크</button>
-      <button class="tab" data-tab="register">회원등록</button>
-      <button class="tab" data-tab="manage">회원관리</button>
-    </nav>
+  }catch(e){
+    alert("검색 오류");
+  }
+}
 
-    <main>
-      <section id="checkin" class="tab-panel active">
-        <div class="card">
-          <h2>회원 검색</h2>
-          <div class="grid2">
-            <input type="text" id="searchKeyword" placeholder="이름, 전화번호, 회원코드 검색" />
-            <button id="searchBtn">검색</button>
-          </div>
-          <p class="help">예: 홍길동 / 01012345678 / M0001</p>
-        </div>
+async function checkin(id){
+  try{
+    const res = await jsonp("checkin",{memberId:id});
+    if(!res.success){
+      alert("출석 실패");
+      return;
+    }
 
-        <div class="card">
-          <h2>검색 결과</h2>
-          <div id="memberResults" class="member-list empty">검색 결과가 없습니다.</div>
-        </div>
-      </section>
+    document.getElementById("remain_"+id).innerText = res.data.remainingSessions;
+    alert("출석 완료");
 
-      <section id="register" class="tab-panel">
-        <form id="registerForm" class="card form-grid">
-          <h2>회원 등록</h2>
-          <label>
-            회원명
-            <input type="text" name="name" required />
-          </label>
-          <label>
-            전화번호
-            <input type="text" name="phone" placeholder="01012345678" required />
-          </label>
-          <label>
-            과정명
-            <input type="text" name="course" placeholder="ITQ 한글 / 파이썬 / 주말반" required />
-          </label>
-          <label>
-            총 등록횟수
-            <input type="number" name="totalSessions" min="0" value="8" required />
-          </label>
-          <label>
-            잔여횟수
-            <input type="number" name="remainingSessions" min="0" value="8" required />
-          </label>
-          <label>
-            시작일
-            <input type="date" name="startDate" />
-          </label>
-          <label>
-            메모
-            <textarea name="note" rows="3" placeholder="바우처 / 주2회 / 특이사항"></textarea>
-          </label>
-          <div class="actions full">
-            <button type="submit">회원 등록하기</button>
-          </div>
-        </form>
-      </section>
+  }catch(e){
+    alert("출석 오류");
+  }
+}
 
-      <section id="manage" class="tab-panel">
-        <div class="card">
-          <h2>회원관리</h2>
-          <div class="grid2">
-            <input type="text" id="manageKeyword" placeholder="검색 후 잔여횟수 추가/수정" />
-            <button id="manageSearchBtn">회원 불러오기</button>
-          </div>
-          <div id="manageResults" class="member-list empty">회원을 검색해 주세요.</div>
-        </div>
-      </section>
-    </main>
-  </div>
+async function register(){
+  const data = {
+    name: document.getElementById("name").value,
+    phone: document.getElementById("phone").value,
+    course: document.getElementById("course").value,
+    totalSessions: document.getElementById("total").value
+  };
 
-  <dialog id="settingsDialog">
-    <form method="dialog" class="card settings-box">
-      <h2>환경설정</h2>
-      <label>
-        Apps Script 웹앱 URL
-        <input type="url" id="apiBaseUrl" placeholder="https://script.google.com/macros/s/......../exec" />
-      </label>
-      <p class="help">배포한 웹앱 주소를 붙여넣으면 됩니다.</p>
-      <div class="actions">
-        <button type="button" id="saveSettingsBtn">저장</button>
-        <button type="submit" class="secondary">닫기</button>
-      </div>
-    </form>
-  </dialog>
+  try{
+    const res = await jsonp("registerMember", data);
+    if(!res.success){
+      alert("등록 실패");
+      return;
+    }
 
-  <template id="memberCardTemplate">
-    <article class="member-card">
-      <div class="member-top">
-        <div>
-          <h3 class="member-name"></h3>
-          <p class="member-meta"></p>
-        </div>
-        <span class="badge remaining"></span>
-      </div>
-      <div class="member-info"></div>
-      <div class="actions">
-        <button class="checkin-btn">출석체크</button>
-        <button class="refresh-btn secondary">새로고침</button>
-      </div>
-    </article>
-  </template>
+    alert("등록 완료");
 
-  <template id="manageCardTemplate">
-    <article class="member-card">
-      <div class="member-top">
-        <div>
-          <h3 class="member-name"></h3>
-          <p class="member-meta"></p>
-        </div>
-        <span class="badge remaining"></span>
-      </div>
-      <div class="member-info"></div>
-      <form class="manage-form inline-form">
-        <label>
-          잔여횟수 변경
-          <input type="number" name="remainingSessions" min="0" required />
-        </label>
-        <label>
-          총 등록횟수 변경
-          <input type="number" name="totalSessions" min="0" required />
-        </label>
-        <label>
-          메모
-          <input type="text" name="note" />
-        </label>
-        <div class="actions full">
-          <button type="submit">회원정보 수정</button>
-        </div>
-      </form>
-    </article>
-  </template>
+  }catch(e){
+    alert("등록 오류");
+  }
+}
+</script>
 
-  <script src="app.js"></script>
 </body>
 </html>
