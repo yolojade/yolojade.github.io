@@ -1,62 +1,47 @@
-const STORAGE_KEY = 'attendance_api_url';
+# Create the requested docs/app.js file with the optimized content
 
-const state = {
-  apiBaseUrl: localStorage.getItem(STORAGE_KEY) || '',
+content = """const state = {
+  apiBaseUrl: localStorage.getItem('attendance_api_url') || '',
+  searchResults: []
 };
 
-const tabs = document.querySelectorAll('.tab');
-const panels = document.querySelectorAll('.tab-panel');
-const settingsDialog = document.getElementById('settingsDialog');
-const apiBaseUrlInput = document.getElementById('apiBaseUrl');
-const memberResults = document.getElementById('memberResults');
-const manageResults = document.getElementById('manageResults');
+document.addEventListener('DOMContentLoaded', () => {
+  bindEvents();
+  restoreApiUrl();
+});
 
-function setApiUrl(url) {
-  state.apiBaseUrl = url.trim();
-  localStorage.setItem(STORAGE_KEY, state.apiBaseUrl);
-  apiBaseUrlInput.value = state.apiBaseUrl;
+function bindEvents() {
+  document.getElementById('saveApiUrlBtn')?.addEventListener('click', saveApiUrl);
+  document.getElementById('testApiBtn')?.addEventListener('click', testApiConnection);
+  document.getElementById('memberSearchBtn')?.addEventListener('click', searchMembers);
+  document.getElementById('registerMemberBtn')?.addEventListener('click', registerMember);
+}
+
+function restoreApiUrl() {
+  const input = document.getElementById('apiUrl');
+  if (input) input.value = state.apiBaseUrl || '';
+}
+
+function saveApiUrl() {
+  const input = document.getElementById('apiUrl');
+  const value = String(input?.value || '').trim();
+
+  if (!/^https:\\/\\/script\\.google\\.com\\/macros\\/s\\/.+\\/exec$/.test(value)) {
+    alert('Apps Script 웹앱 URL 형식이 아닙니다. /exec 로 끝나는 주소를 넣어주세요.');
+    return;
+  }
+
+  state.apiBaseUrl = value;
+  localStorage.setItem('attendance_api_url', value);
+  alert('저장되었습니다.');
 }
 
 function ensureApiUrl() {
   if (!state.apiBaseUrl) {
-    showToast('먼저 환경설정에서 Apps Script 웹앱 URL을 저장해 주세요.');
-    settingsDialog.showModal();
+    alert('먼저 Apps Script 웹앱 URL을 저장하세요.');
     return false;
   }
   return true;
-}
-
-function switchTab(tabName) {
-  tabs.forEach(btn => btn.classList.toggle('active', btn.dataset.tab === tabName));
-  panels.forEach(panel => panel.classList.toggle('active', panel.id === tabName));
-}
-
-tabs.forEach(btn => {
-  btn.addEventListener('click', () => switchTab(btn.dataset.tab));
-});
-
-document.getElementById('openSettingsBtn').addEventListener('click', () => {
-  apiBaseUrlInput.value = state.apiBaseUrl;
-  settingsDialog.showModal();
-});
-
-document.getElementById('saveSettingsBtn').addEventListener('click', () => {
-  const value = apiBaseUrlInput.value.trim();
-  if (!value) {
-    showToast('웹앱 URL을 입력해 주세요.');
-    return;
-  }
-  setApiUrl(value);
-  settingsDialog.close();
-  showToast('환경설정이 저장되었습니다.');
-});
-
-function showToast(message) {
-  const toast = document.createElement('div');
-  toast.className = 'toast';
-  toast.textContent = message;
-  document.body.appendChild(toast);
-  setTimeout(() => toast.remove(), 2200);
 }
 
 function jsonp(action, params = {}) {
@@ -69,7 +54,7 @@ function jsonp(action, params = {}) {
     const callbackName = `jsonp_${Date.now()}_${Math.floor(Math.random() * 10000)}`;
     const url = new URL(state.apiBaseUrl);
     url.searchParams.set('action', action);
-    url.searchParams.set('callback', callbackName);
+    url.searchParams.set('cb', callbackName);
 
     Object.entries(params).forEach(([key, value]) => {
       if (value !== undefined && value !== null && value !== '') {
@@ -78,17 +63,32 @@ function jsonp(action, params = {}) {
     });
 
     const script = document.createElement('script');
+    let done = false;
+
+    function cleanup() {
+      if (script.parentNode) script.parentNode.removeChild(script);
+      try { delete window[callbackName]; } catch (e) {}
+    }
+
+    const timer = setTimeout(() => {
+      if (done) return;
+      done = true;
+      cleanup();
+      reject(new Error('응답 시간이 초과되었습니다.'));
+    }, 10000);
+
     window[callbackName] = (data) => {
+      if (done) return;
+      done = true;
+      clearTimeout(timer);
       cleanup();
       resolve(data);
     };
 
-    function cleanup() {
-      delete window[callbackName];
-      script.remove();
-    }
-
     script.onerror = () => {
+      if (done) return;
+      done = true;
+      clearTimeout(timer);
       cleanup();
       reject(new Error('API 호출 실패'));
     };
@@ -98,158 +98,146 @@ function jsonp(action, params = {}) {
   });
 }
 
-function formatMemberInfo(member) {
-  return `전화번호: ${member.phone || '-'}<br>
-  회원코드: ${member.memberId}<br>
-  과정: ${member.course || '-'}<br>
-  총 등록횟수: ${member.totalSessions}<br>
-  사용횟수: ${member.usedSessions}<br>
-  시작일: ${member.startDate || '-'}<br>
-  메모: ${member.note || '-'}`;
+async function testApiConnection() {
+  try {
+    const res = await jsonp('health');
+    if (res.success) {
+      alert('API 연결 성공');
+    } else {
+      alert('API 오류: ' + (res.error || '알 수 없음'));
+    }
+  } catch (err) {
+    alert('API 호출 실패: ' + err.message);
+  }
 }
 
-function renderCheckinResults(members) {
-  if (!members || members.length === 0) {
-    memberResults.className = 'member-list empty';
-    memberResults.textContent = '검색 결과가 없습니다.';
+async function searchMembers() {
+  const keyword = String(document.getElementById('memberSearchKeyword')?.value || '').trim();
+
+  if (!keyword) {
+    renderMemberResults([]);
+    alert('이름, 회원ID, 전화번호 중 하나를 입력하세요.');
     return;
   }
 
-  memberResults.className = 'member-list';
-  memberResults.innerHTML = '';
-  const tpl = document.getElementById('memberCardTemplate');
+  const btn = document.getElementById('memberSearchBtn');
+  if (btn) btn.disabled = true;
 
-  members.forEach(member => {
-    const node = tpl.content.cloneNode(true);
-    node.querySelector('.member-name').textContent = member.name;
-    node.querySelector('.member-meta').textContent = `${member.course || '-'} · ${member.memberId}`;
-    const badge = node.querySelector('.remaining');
-    badge.textContent = `잔여 ${member.remainingSessions}회`;
-    if (Number(member.remainingSessions) <= 0) badge.classList.add('zero');
-    node.querySelector('.member-info').innerHTML = formatMemberInfo(member);
+  try {
+    const res = await jsonp('findMembers', { keyword });
 
-    node.querySelector('.checkin-btn').addEventListener('click', async () => {
-      if (Number(member.remainingSessions) <= 0) {
-        showToast('잔여횟수가 0회입니다. 먼저 회원관리에서 수정해 주세요.');
-        return;
-      }
-      try {
-        const result = await jsonp('checkin', { memberId: member.memberId });
-        if (!result.success) throw new Error(result.message || '출석체크 실패');
-        showToast(`${member.name} 출석 완료 · 잔여 ${result.data.remainingSessions}회`);
-        searchMembers(document.getElementById('searchKeyword').value.trim());
-      } catch (error) {
-        showToast(error.message || '출석체크 중 오류가 발생했습니다.');
-      }
-    });
+    if (!res.success) {
+      throw new Error(res.error || '검색 실패');
+    }
 
-    node.querySelector('.refresh-btn').addEventListener('click', () => {
-      searchMembers(document.getElementById('searchKeyword').value.trim());
-    });
-
-    memberResults.appendChild(node);
-  });
+    state.searchResults = res.data?.members || [];
+    renderMemberResults(state.searchResults);
+  } catch (err) {
+    alert('회원 검색 실패: ' + err.message);
+    renderMemberResults([]);
+  } finally {
+    if (btn) btn.disabled = false;
+  }
 }
 
-function renderManageResults(members) {
+function renderMemberResults(members) {
+  const container = document.getElementById('memberSearchResults');
+  if (!container) return;
+
   if (!members || members.length === 0) {
-    manageResults.className = 'member-list empty';
-    manageResults.textContent = '검색 결과가 없습니다.';
+    container.innerHTML = '<p>검색 결과가 없습니다.</p>';
     return;
   }
 
-  manageResults.className = 'member-list';
-  manageResults.innerHTML = '';
-  const tpl = document.getElementById('manageCardTemplate');
+  container.innerHTML = members.map(member => `
+    <div class="member-card">
+      <div><strong>${escapeHtml(member.name)}</strong> (${escapeHtml(member.memberId)})</div>
+      <div>전화번호: ${escapeHtml(member.phone || '')}</div>
+      <div>과정: ${escapeHtml(member.course || '')}</div>
+      <div>잔여횟수: <span id="remaining-${escapeHtml(member.memberId)}">${member.remainingSessions ?? 0}</span></div>
+      <div class="member-card-actions">
+        <button onclick="checkinMember('${escapeJs(member.memberId)}')">출석체크</button>
+      </div>
+    </div>
+  `).join('');
+}
 
-  members.forEach(member => {
-    const node = tpl.content.cloneNode(true);
-    node.querySelector('.member-name').textContent = member.name;
-    node.querySelector('.member-meta').textContent = `${member.course || '-'} · ${member.memberId}`;
-    const badge = node.querySelector('.remaining');
-    badge.textContent = `잔여 ${member.remainingSessions}회`;
-    if (Number(member.remainingSessions) <= 0) badge.classList.add('zero');
-    node.querySelector('.member-info').innerHTML = formatMemberInfo(member);
+async function registerMember() {
+  const payload = {
+    name: document.getElementById('regName')?.value || '',
+    phone: document.getElementById('regPhone')?.value || '',
+    course: document.getElementById('regCourse')?.value || '',
+    totalSessions: document.getElementById('regTotalSessions')?.value || 0,
+    remainingSessions: document.getElementById('regRemainingSessions')?.value || 0,
+    usedSessions: document.getElementById('regUsedSessions')?.value || 0,
+    startDate: document.getElementById('regStartDate')?.value || '',
+    note: document.getElementById('regNote')?.value || ''
+  };
 
-    const form = node.querySelector('.manage-form');
-    form.remainingSessions.value = member.remainingSessions;
-    form.totalSessions.value = member.totalSessions;
-    form.note.value = member.note || '';
+  const btn = document.getElementById('registerMemberBtn');
+  if (btn) btn.disabled = true;
 
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      try {
-        const result = await jsonp('updateMember', {
-          memberId: member.memberId,
-          remainingSessions: form.remainingSessions.value,
-          totalSessions: form.totalSessions.value,
-          note: form.note.value,
-        });
-        if (!result.success) throw new Error(result.message || '수정 실패');
-        showToast(`${member.name} 회원정보 수정 완료`);
-        manageMembers(document.getElementById('manageKeyword').value.trim());
-      } catch (error) {
-        showToast(error.message || '회원정보 수정 중 오류가 발생했습니다.');
-      }
+  try {
+    const res = await jsonp('registerMember', payload);
+
+    if (!res.success) {
+      throw new Error(res.error || '회원등록 실패');
+    }
+
+    alert(`회원등록 완료: ${res.data.name} (${res.data.memberId})`);
+    clearRegisterForm();
+  } catch (err) {
+    alert('회원등록 실패: ' + err.message);
+  } finally {
+    if (btn) btn.disabled = false;
+  }
+}
+
+async function checkinMember(memberId) {
+  if (!memberId) return;
+
+  try {
+    const res = await jsonp('checkin', { memberId });
+
+    if (!res.success) {
+      throw new Error(res.error || '출석 실패');
+    }
+
+    const remainEl = document.getElementById(`remaining-${memberId}`);
+    if (remainEl) {
+      remainEl.textContent = res.data.remainingSessions;
+    }
+
+    alert(`${res.data.name} 출석 완료\\n잔여횟수: ${res.data.remainingSessions}`);
+  } catch (err) {
+    alert('출석 실패: ' + err.message);
+  }
+}
+
+function clearRegisterForm() {
+  ['regName', 'regPhone', 'regCourse', 'regTotalSessions', 'regRemainingSessions', 'regUsedSessions', 'regStartDate', 'regNote']
+    .forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = '';
     });
-
-    manageResults.appendChild(node);
-  });
 }
 
-async function searchMembers(keyword) {
-  try {
-    const result = await jsonp('findMembers', { keyword });
-    if (!result.success) throw new Error(result.message || '검색 실패');
-    renderCheckinResults(result.data.members || []);
-  } catch (error) {
-    showToast(error.message || '회원 검색 중 오류가 발생했습니다.');
-  }
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/\"/g, '&quot;')
+    .replace(/'/g, '&#39;');
 }
 
-async function manageMembers(keyword) {
-  try {
-    const result = await jsonp('findMembers', { keyword });
-    if (!result.success) throw new Error(result.message || '검색 실패');
-    renderManageResults(result.data.members || []);
-  } catch (error) {
-    showToast(error.message || '회원 검색 중 오류가 발생했습니다.');
-  }
+function escapeJs(value) {
+  return String(value ?? '').replace(/'/g, "\\\\'");
 }
+"""
 
-document.getElementById('searchBtn').addEventListener('click', () => {
-  const keyword = document.getElementById('searchKeyword').value.trim();
-  searchMembers(keyword);
-});
+file_path = "/mnt/data/app.js"
+with open(file_path, "w", encoding="utf-8") as f:
+    f.write(content)
 
-document.getElementById('manageSearchBtn').addEventListener('click', () => {
-  const keyword = document.getElementById('manageKeyword').value.trim();
-  manageMembers(keyword);
-});
-
-document.getElementById('registerForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const formData = new FormData(e.target);
-  const payload = Object.fromEntries(formData.entries());
-
-  try {
-    const result = await jsonp('registerMember', payload);
-    if (!result.success) throw new Error(result.message || '회원 등록 실패');
-    e.target.reset();
-    showToast(`회원 등록 완료 · 회원코드 ${result.data.memberId}`);
-    switchTab('manage');
-    document.getElementById('manageKeyword').value = result.data.memberId;
-    manageMembers(result.data.memberId);
-  } catch (error) {
-    showToast(error.message || '회원 등록 중 오류가 발생했습니다.');
-  }
-});
-
-apiBaseUrlInput.value = state.apiBaseUrl;
-
-const params = new URLSearchParams(location.search);
-const queryKeyword = params.get('q');
-if (queryKeyword) {
-  document.getElementById('searchKeyword').value = queryKeyword;
-  searchMembers(queryKeyword);
-}
+file_path
