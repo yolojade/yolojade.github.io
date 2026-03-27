@@ -3,42 +3,69 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>파이썬 기초 퀴즈</title>
-    <link rel="stylesheet" href="style.css" />
+    <title>파이썬 문제 모음</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        padding: 40px 20px;
+        font-family: "Malgun Gothic", "맑은 고딕", Arial, sans-serif;
+        background: #f4f4f4;
+        color: #111;
+      }
+      .wrap {
+        max-width: 900px;
+        margin: 0 auto;
+      }
+      h1 {
+        text-align: center;
+        margin-bottom: 30px;
+      }
+      .card-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 20px;
+      }
+      .card {
+        background: #fff;
+        border: 1px solid #ccc;
+        padding: 20px;
+        text-decoration: none;
+        color: #111;
+        border-radius: 10px;
+        transition: 0.2s;
+      }
+      .card:hover {
+        transform: translateY(-3px);
+        background: #fafafa;
+      }
+      .card h2 {
+        margin-top: 0;
+        font-size: 22px;
+      }
+      .card p {
+        margin-bottom: 0;
+        color: #555;
+      }
+    </style>
   </head>
   <body>
-    <div class="quiz-wrapper">
-      <h1>파이썬 기초 퀴즈</h1>
+    <div class="wrap">
+      <h1>파이썬 문제 모음</h1>
 
-      <div id="start-section" class="start-section">
-        <div class="student-form">
-          <label for="student-id">학번</label>
-          <input type="text" id="student-id" placeholder="학번을 입력하세요" />
+      <div class="card-list">
+        <a class="card" href="./quiz1/">
+          <h2>1번 문제</h2>
+          <p>리스트 기초 문제 풀기</p>
+        </a>
 
-          <label for="student-name">이름</label>
-          <input
-            type="text"
-            id="student-name"
-            placeholder="이름을 입력하세요"
-          />
-
-          <button onclick="startQuiz()">시작하기</button>
-        </div>
-      </div>
-
-      <div id="quiz-section" style="display: none">
-        <div id="quiz-container"></div>
-
-        <div class="button-group">
-          <button onclick="submitQuiz()">제출하기</button>
-          <button onclick="showAnswers()">정답보기</button>
-          <button onclick="resetQuiz()">다시 풀기</button>
-        </div>
-
-        <div id="result"></div>
+        <a class="card" href="./quiz2/">
+          <h2>2번 문제</h2>
+          <p>문자열 문제 풀기</p>
+        </a>
       </div>
     </div>
-
-    <script src="script.js"></script>
   </body>
 </html>
