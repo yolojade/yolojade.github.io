@@ -85,13 +85,13 @@ print(r-50)
 100
 -50
 
-12
-r=0
-print(r+100)
-print(r-50)
+13
+print(3)
+a=5
+print(a)
 ===
-100
--50
+3
+5
 
 14
 print("가")
