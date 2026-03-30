@@ -3,165 +3,75 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>컴벤져스 출석체크</title>
-  <link rel="stylesheet" href="style.css" />
+  <title>PT 회원 출석관리</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <div class="container">
-    <header class="hero">
+    <header class="header nav-header">
       <div>
-        <p class="eyebrow">QR 체크인 페이지</p>
-        <h1>출석체크 · 회원등록 · 잔여횟수 확인</h1>
-        <p class="sub">GitHub Pages 프론트엔드 + Google Sheets 저장 방식</p>
+        <h1>PT 회원 출석관리</h1>
+        <p>회원은 회원번호만 입력해서 출석체크할 수 있습니다.</p>
       </div>
-      <button id="openSettingsBtn" class="secondary">환경설정</button>
+      <nav class="top-nav">
+        <a href="index.html" class="nav-link active">출석체크</a>
+        <a href="schedule.html" class="nav-link">스케줄</a>
+      </nav>
     </header>
 
-    <section class="card notice">
-      <strong>사용 순서</strong>
-      <ol>
-        <li>환경설정에서 Apps Script 웹앱 URL을 넣습니다.</li>
-        <li>회원등록 탭에서 회원을 등록합니다.</li>
-        <li>QR코드에는 이 페이지 주소를 넣습니다.</li>
-        <li>현장에서 회원 검색 후 출석체크를 누르면 시트에 기록됩니다.</li>
-      </ol>
+    <section class="panel hero">
+      <h2>출석체크</h2>
+      <p class="desc">회원번호를 입력하고 출석 버튼을 누르세요.</p>
+      <div class="row">
+        <input type="text" id="memberNoInput" placeholder="예: PT0001" />
+        <button id="checkInByNoBtn" class="action-checkin big">출석체크</button>
+      </div>
+      <div id="checkinStatus" class="status large">준비됨</div>
     </section>
 
-    <nav class="tabs">
-      <button class="tab active" data-tab="checkin">출석체크</button>
-      <button class="tab" data-tab="register">회원등록</button>
-      <button class="tab" data-tab="manage">회원관리</button>
-    </nav>
+    <section class="panel admin-panel">
+      <div class="section-title">
+        <h2>관리자 메뉴</h2>
+        <button id="toggleAdminBtn" class="secondary">열기</button>
+      </div>
 
-    <main>
-      <section id="checkin" class="tab-panel active">
-        <div class="card">
-          <h2>회원 검색</h2>
-          <div class="grid2">
-            <input type="text" id="searchKeyword" placeholder="이름, 전화번호, 회원코드 검색" />
-            <button id="searchBtn">검색</button>
+      <div id="adminArea" class="admin-area hidden">
+        <div id="adminLockBox" class="admin-lock-box">
+          <p class="desc">관리자 PIN을 입력해야 등록/횟수추가 기능을 사용할 수 있습니다.</p>
+          <div class="row">
+            <input type="password" id="adminPinInput" placeholder="관리자 PIN" />
+            <button id="unlockAdminBtn">잠금 해제</button>
           </div>
-          <p class="help">예: 홍길동 / 01012345678 / M0001</p>
+          <div id="adminLockStatus" class="status"></div>
         </div>
 
-        <div class="card">
-          <h2>검색 결과</h2>
-          <div id="memberResults" class="member-list empty">검색 결과가 없습니다.</div>
-        </div>
-      </section>
+        <div id="adminContent" class="hidden">
+          <div class="admin-grid">
+            <section class="subpanel">
+              <h3>회원 등록</h3>
+              <div class="stack">
+                <input type="text" id="name" placeholder="이름" />
+                <input type="text" id="phone" placeholder="전화번호(선택)" />
+                <button id="addBtn" class="action-add">회원 등록 (기본 10회)</button>
+              </div>
+              <div id="registerStatus" class="status"></div>
+            </section>
 
-      <section id="register" class="tab-panel">
-        <form id="registerForm" class="card form-grid">
-          <h2>회원 등록</h2>
-          <label>
-            회원명
-            <input type="text" name="name" required />
-          </label>
-          <label>
-            전화번호
-            <input type="text" name="phone" placeholder="01012345678" required />
-          </label>
-          <label>
-            과정명
-            <input type="text" name="course" placeholder="ITQ 한글 / 파이썬 / 주말반" required />
-          </label>
-          <label>
-            총 등록횟수
-            <input type="number" name="totalSessions" min="0" value="8" required />
-          </label>
-          <label>
-            잔여횟수
-            <input type="number" name="remainingSessions" min="0" value="8" required />
-          </label>
-          <label>
-            시작일
-            <input type="date" name="startDate" />
-          </label>
-          <label>
-            메모
-            <textarea name="note" rows="3" placeholder="바우처 / 주2회 / 특이사항"></textarea>
-          </label>
-          <div class="actions full">
-            <button type="submit">회원 등록하기</button>
+            <section class="subpanel">
+              <h3>회원 검색 / 횟수 추가</h3>
+              <div class="row">
+                <input type="text" id="searchAdmin" placeholder="이름 또는 회원번호 검색" />
+                <button id="searchAdminBtn">검색</button>
+              </div>
+              <div id="adminSearchStatus" class="status"></div>
+              <div id="adminMemberList" class="grid"></div>
+            </section>
           </div>
-        </form>
-      </section>
-
-      <section id="manage" class="tab-panel">
-        <div class="card">
-          <h2>회원관리</h2>
-          <div class="grid2">
-            <input type="text" id="manageKeyword" placeholder="검색 후 잔여횟수 추가/수정" />
-            <button id="manageSearchBtn">회원 불러오기</button>
-          </div>
-          <div id="manageResults" class="member-list empty">회원을 검색해 주세요.</div>
         </div>
-      </section>
-    </main>
+      </div>
+    </section>
   </div>
 
-  <dialog id="settingsDialog">
-    <form method="dialog" class="card settings-box">
-      <h2>환경설정</h2>
-      <label>
-        Apps Script 웹앱 URL
-        <input type="url" id="apiBaseUrl" placeholder="https://script.google.com/macros/s/......../exec" />
-      </label>
-      <p class="help">배포한 웹앱 주소를 붙여넣으면 됩니다.</p>
-      <div class="actions">
-        <button type="button" id="saveSettingsBtn">저장</button>
-        <button type="submit" class="secondary">닫기</button>
-      </div>
-    </form>
-  </dialog>
-
-  <template id="memberCardTemplate">
-    <article class="member-card">
-      <div class="member-top">
-        <div>
-          <h3 class="member-name"></h3>
-          <p class="member-meta"></p>
-        </div>
-        <span class="badge remaining"></span>
-      </div>
-      <div class="member-info"></div>
-      <div class="actions">
-        <button class="checkin-btn">출석체크</button>
-        <button class="refresh-btn secondary">새로고침</button>
-      </div>
-    </article>
-  </template>
-
-  <template id="manageCardTemplate">
-    <article class="member-card">
-      <div class="member-top">
-        <div>
-          <h3 class="member-name"></h3>
-          <p class="member-meta"></p>
-        </div>
-        <span class="badge remaining"></span>
-      </div>
-      <div class="member-info"></div>
-      <form class="manage-form inline-form">
-        <label>
-          잔여횟수 변경
-          <input type="number" name="remainingSessions" min="0" required />
-        </label>
-        <label>
-          총 등록횟수 변경
-          <input type="number" name="totalSessions" min="0" required />
-        </label>
-        <label>
-          메모
-          <input type="text" name="note" />
-        </label>
-        <div class="actions full">
-          <button type="submit">회원정보 수정</button>
-        </div>
-      </form>
-    </article>
-  </template>
-
-  <script src="app.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
