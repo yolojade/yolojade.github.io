@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>PDF 업로드 테스트</title>
+  <title>PDF 다운로드 테스트</title>
   <style>
     * {
       box-sizing: border-box;
@@ -41,20 +41,6 @@
       line-height: 1.55;
     }
 
-    label {
-      display: block;
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
-
-    input[type="file"] {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid #b9c6d8;
-      border-radius: 6px;
-      background: #fbfdff;
-    }
-
     .file-info {
       min-height: 24px;
       margin: 18px 0;
@@ -74,86 +60,20 @@
       color: #ffffff;
       font-weight: 700;
       text-decoration: none;
-      pointer-events: none;
-      opacity: 0.45;
-    }
-
-    .download-link.is-ready {
-      pointer-events: auto;
-      opacity: 1;
     }
   </style>
 </head>
 <body>
   <main>
-    <h1>PDF 업로드 테스트</h1>
-    <p>PDF 파일을 선택하면 같은 파일을 바로 다운로드할 수 있는 링크가 만들어집니다.</p>
+    <h1>PDF 다운로드 테스트</h1>
+    <p>아래 버튼을 누르면 준비된 PDF 파일을 다운로드할 수 있습니다.</p>
 
-    <label for="pdfUpload">PDF 파일 선택</label>
-    <input id="pdfUpload" type="file" accept="application/pdf,.pdf">
-
-    <div id="fileInfo" class="file-info">아직 선택된 PDF가 없습니다.</div>
-    <a id="downloadLink" class="download-link" href="#" download>PDF 다운로드</a>
+    <div class="file-info">파일: python-1.pdf</div>
+    <a
+      class="download-link"
+      href="https://yolojade.github.io/files/python-1.pdf"
+      download="python-1.pdf"
+    >PDF 다운로드</a>
   </main>
-
-  <script>
-    const pdfUpload = document.getElementById("pdfUpload");
-    const fileInfo = document.getElementById("fileInfo");
-    const downloadLink = document.getElementById("downloadLink");
-    let objectUrl = "";
-
-    pdfUpload.addEventListener("change", () => {
-      const file = pdfUpload.files[0];
-
-      if (objectUrl) {
-        URL.revokeObjectURL(objectUrl);
-        objectUrl = "";
-      }
-
-      downloadLink.classList.remove("is-ready");
-      downloadLink.removeAttribute("href");
-      downloadLink.removeAttribute("download");
-
-      if (!file) {
-        fileInfo.textContent = "아직 선택된 PDF가 없습니다.";
-        return;
-      }
-
-      if (file.type !== "application/pdf" && !file.name.toLowerCase().endsWith(".pdf")) {
-        fileInfo.textContent = "PDF 파일만 업로드할 수 있습니다.";
-        pdfUpload.value = "";
-        return;
-      }
-
-      objectUrl = URL.createObjectURL(file);
-      downloadLink.href = objectUrl;
-      downloadLink.download = file.name;
-      downloadLink.classList.add("is-ready");
-      fileInfo.textContent = `선택한 파일: ${file.name} (${formatBytes(file.size)})`;
-    });
-
-    window.addEventListener("beforeunload", () => {
-      if (objectUrl) {
-        URL.revokeObjectURL(objectUrl);
-      }
-    });
-
-    function formatBytes(bytes) {
-      if (bytes < 1024) {
-        return `${bytes} B`;
-      }
-
-      const units = ["KB", "MB", "GB"];
-      let size = bytes / 1024;
-      let unitIndex = 0;
-
-      while (size >= 1024 && unitIndex < units.length - 1) {
-        size /= 1024;
-        unitIndex += 1;
-      }
-
-      return `${size.toFixed(1)} ${units[unitIndex]}`;
-    }
-  </script>
 </body>
 </html>
