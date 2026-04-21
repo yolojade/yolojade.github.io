@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>엑셀 기반 문제 풀이 사이트</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+      background: #f5f7fb;
+      color: #222;
+    }
+    .wrap {
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 20px;
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 20px;
+    }
+    .panel {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+      padding: 18px;
+    }
+    h2, h3 { margin-top: 0; }
+    .small { color: #64748b; font-size: 14px; line-height: 1.6; }
+
+    .result-box, .answer-box, .explain-box, .wrong-box {
+      border-radius: 14px;
+      padding: 16px;
+      margin-top: 12px;
+      line-height: 1.7;
+      white-space: pre-line;
+    }
+    .result-box { background: #f8fafc; border: 1px solid #cbd5e1; }
+    .answer-box { background: #fffbeb; border: 1px solid #fcd34d; }
+    .explain-box { background: #f5f3ff; border: 1px solid #c4b5fd; }
+    .wrong-box { background: #fef2f2; border: 1px solid #fca5a5; }
+    .hidden { display: none; }
+
+    .sheet-select {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 12px;
+      margin-top: 10px;
+      font: inherit;
+      background: white;
+    }
+    .question-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .q-btn {
+      border: none;
+      border-radius: 12px;
+      padding: 12px 0;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      background: #eef2ff;
+      color: #334155;
+      transition: 0.2s;
+    }
+    .q-btn:hover { transform: translateY(-1px); }
+    .q-btn.active { background: #2563eb; color: #fff; }
+    .q-btn.correct { background: #16a34a; color: #fff; }
+    .q-btn.wrong { background: #dc2626; color: #fff; }
+    .q-btn.unanswered { background: #f1f5f9; color: #64748b; }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+    .badge {
+      background: #eff6ff;
+      color: #1d4ed8;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 14px;
+    }
+    .question-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 18px;
+      margin-bottom: 18px;
+      line-height: 1.7;
+      white-space: pre-line;
+      min-height: 120px;
+    }
+    .choice-list {
+      display: grid;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .choice {
+      border: 1px solid #cbd5e1;
+      border-radius: 14px;
+      padding: 14px;
+      cursor: pointer;
+      background: #fff;
+      transition: 0.2s;
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+    }
+    .choice:hover { border-color: #2563eb; }
+    .choice input { margin-top: 4px; }
+    .choice.selected { border: 2px solid #2563eb; background: #eff6ff; }
+    .choice.reveal-correct { border: 2px solid #16a34a; background: #f0fdf4; }
+    .choice.reveal-wrong { border: 2px solid #dc2626; background: #fef2f2; }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    button.action {
+      border: none;
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-weight: 700;
+      cursor: pointer;
+      background: #2563eb;
+      color: white;
+    }
+    button.action.secondary { background: #475569; }
+    button.action.ghost { background: #e2e8f0; color: #1e293b; }
+    button.action.red { background: #dc2626; }
+    button.action:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .wrong-item {
+      border: 1px solid #fecaca;
+      background: #fff;
+      border-radius: 12px;
+      padding: 14px;
+      margin-top: 10px;
+      white-space: pre-line;
+    }
+    .wrong-item strong {
+      display: inline-block;
+      margin-bottom: 6px;
+    }
+    textarea.export-area {
+      width: 100%;
+      min-height: 200px;
+      resize: vertical;
+      border: 1px solid #cbd5e1;
+      border-radius: 12px;
+      padding: 12px;
+      font: inherit;
+      margin-top: 10px;
+    }
+
+    @media (max-width: 980px) {
+      .wrap { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 560px) {
+      .question-grid { grid-template-columns: repeat(4, 1fr); }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <aside class="panel left">
+      <h2>회차 선택</h2>
+
+      <select id="sheetSelect" class="sheet-select" disabled>
+        <option>시트를 선택하세요</option>
+      </select>
+
+      <div class="result-box">
+        <div><strong>진행 현황</strong></div>
+        <div id="sheetInfo">시트 미선택</div>
+        <div id="progressText">0 / 0 문제 선택</div>
+        <div id="scoreText">채점 전</div>
+      </div>
+
+      <div class="result-box">
+        <div><strong>문제 번호</strong></div>
+        <div id="questionGrid" class="question-grid"></div>
+      </div>
+    </aside>
+
+    <main class="panel right">
+      <div class="top-bar">
+        <h2 id="questionTitle">엑셀 파일을 불러오는 중입니다</h2>
+        <div class="badge" id="currentBadge">-</div>
+      </div>
+
+      <div id="questionBox" class="question-box">설정된 경로에서 엑셀 파일을 자동으로 읽어옵니다.</div>
+      <div id="choiceList" class="choice-list"></div>
+
+      <div class="controls">
+        <button class="action" id="gradeBtn" disabled>채점하기</button>
+        <button class="action secondary" id="showAnswerBtn" disabled>정답 보기</button>
+        <button class="action ghost" id="toggleExplainBtn" disabled>해설 보기</button>
+        <button class="action ghost" id="prevBtn" disabled>이전 문제</button>
+        <button class="action ghost" id="nextBtn" disabled>다음 문제</button>
+        <button class="action red" id="showWrongBtn" disabled>틀린문제 출력</button>
+      </div>
+
+      <div id="gradeResult" class="result-box hidden"></div>
+      <div id="answerBox" class="answer-box hidden"></div>
+      <div id="explainBox" class="explain-box hidden"></div>
+
+      <div id="wrongSection" class="wrong-box hidden">
+        <strong>틀린 문제 정리</strong>
+        <div id="wrongSummary" class="small"></div>
+        <div id="wrongList"></div>
+        <textarea id="wrongExport" class="export-area" readonly placeholder="틀린 문제 정리 텍스트가 여기에 표시됩니다."></textarea>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script>
+    const EXCEL_FILE_PATH = './data/problem-set.xlsx';
+    const ANSWER_STORAGE_PREFIX = 'quiz_sheet_answers_v2_';
+    const WRONG_STORAGE_PREFIX = 'quiz_sheet_wrong_v2_';
+
+    const workbookStore = {
+      workbook: null,
+      sheetNames: [],
+      currentSheet: '',
+      quizData: []
+    };
+
+    let currentIndex = 0;
+    let userAnswers = [];
+    let gradingDone = false;
+    let explanationVisible = false;
+    let answerVisible = false;
+
+    const sheetSelect = document.getElementById('sheetSelect');
+    const sheetInfo = document.getElementById('sheetInfo');
+    const questionGrid = document.getElementById('questionGrid');
+    const questionTitle = document.getElementById('questionTitle');
+    const currentBadge = document.getElementById('currentBadge');
+    const questionBox = document.getElementById('questionBox');
+    const choiceList = document.getElementById('choiceList');
+    const progressText = document.getElementById('progressText');
+    const scoreText = document.getElementById('scoreText');
+    const gradeResult = document.getElementById('gradeResult');
+    const answerBox = document.getElementById('answerBox');
+    const explainBox = document.getElementById('explainBox');
+    const wrongSection = document.getElementById('wrongSection');
+    const wrongSummary = document.getElementById('wrongSummary');
+    const wrongList = document.getElementById('wrongList');
+    const wrongExport = document.getElementById('wrongExport');
+    const gradeBtn = document.getElementById('gradeBtn');
+    const showAnswerBtn = document.getElementById('showAnswerBtn');
+    const toggleExplainBtn = document.getElementById('toggleExplainBtn');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const showWrongBtn = document.getElementById('showWrongBtn');
+
+    function getAnswerStorageKey(sheetName) {
+      return `${ANSWER_STORAGE_PREFIX}${sheetName}`;
+    }
+
+    function getWrongStorageKey(sheetName) {
+      return `${WRONG_STORAGE_PREFIX}${sheetName}`;
+    }
+
+    function resetViewToggles() {
+      answerVisible = false;
+      explanationVisible = false;
+      showAnswerBtn.textContent = '정답 보기';
+      toggleExplainBtn.textContent = '해설 보기';
+    }
+
+    function setButtonsEnabled(enabled) {
+      gradeBtn.disabled = !enabled;
+      showAnswerBtn.disabled = !enabled;
+      toggleExplainBtn.disabled = !enabled;
+      prevBtn.disabled = !enabled;
+      nextBtn.disabled = !enabled;
+      showWrongBtn.disabled = !enabled;
+    }
+
+    function parseSheetToQuizData(sheet) {
+      const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
+      const parsed = [];
+
+      for (let i = 0; i < rows.length; i += 1) {
+        const row = rows[i];
+        if (!row || row.every(cell => String(cell).trim() === '')) continue;
+
+        const firstCell = String(row[0] ?? '').trim();
+        const secondCell = String(row[1] ?? '').trim();
+        if (i === 0 && /문제|question/i.test(firstCell) && /보기|choice|선택지/i.test(secondCell)) {
+          continue;
+        }
+
+        const question = String(row[0] ?? '').trim();
+        const c1 = String(row[1] ?? '').trim();
+        const c2 = String(row[2] ?? '').trim();
+        const c3 = String(row[3] ?? '').trim();
+        const c4 = String(row[4] ?? '').trim();
+        const answer = Number(row[5]);
+        const explanation = String(row[6] ?? '').trim() || '해설 없음';
+
+        if (!question || !c1 || !c2 || !c3 || !c4 || ![1, 2, 3, 4].includes(answer)) continue;
+
+        parsed.push({
+          number: parsed.length + 1,
+          question,
+          choices: [c1, c2, c3, c4],
+          answer,
+          explanation
+        });
+      }
+
+      return parsed;
+    }
+
+    function loadAnswersForSheet(sheetName) {
+      try {
+        const saved = localStorage.getItem(getAnswerStorageKey(sheetName));
+        const parsed = saved ? JSON.parse(saved) : [];
+        userAnswers = Array.isArray(parsed) && parsed.length === workbookStore.quizData.length
+          ? parsed
+          : new Array(workbookStore.quizData.length).fill(null);
+      } catch {
+        userAnswers = new Array(workbookStore.quizData.length).fill(null);
+      }
+    }
+
+    function saveAnswersForSheet() {
+      if (!workbookStore.currentSheet) return;
+      localStorage.setItem(getAnswerStorageKey(workbookStore.currentSheet), JSON.stringify(userAnswers));
+    }
+
+    function buildWrongAnswerData() {
+      return workbookStore.quizData
+        .map((q, index) => ({ question: q, userAnswer: userAnswers[index], index }))
+        .filter(item => item.userAnswer !== null && item.userAnswer !== item.question.answer)
+        .map(item => ({
+          number: item.question.number,
+          question: item.question.question,
+          choices: item.question.choices,
+          correctAnswer: item.question.answer,
+          correctChoiceText: item.question.choices[item.question.answer - 1],
+          userAnswer: item.userAnswer,
+          userChoiceText: item.question.choices[item.userAnswer - 1] || '미선택',
+          explanation: item.question.explanation
+        }));
+    }
+
+    function saveWrongAnswerData(wrongData) {
+      if (!workbookStore.currentSheet) return;
+      localStorage.setItem(getWrongStorageKey(workbookStore.currentSheet), JSON.stringify(wrongData));
+    }
+
+    function renderQuestionButtons() {
+      questionGrid.innerHTML = '';
+      workbookStore.quizData.forEach((q, index) => {
+        const btn = document.createElement('button');
+        btn.className = 'q-btn';
+        btn.textContent = q.number;
+        if (index === currentIndex) btn.classList.add('active');
+
+        if (gradingDone) {
+          if (userAnswers[index] === null) btn.classList.add('unanswered');
+          else if (userAnswers[index] === q.answer) btn.classList.add('correct');
+          else btn.classList.add('wrong');
+        }
+
+        btn.addEventListener('click', () => {
+          currentIndex = index;
+          resetViewToggles();
+          render();
+        });
+        questionGrid.appendChild(btn);
+      });
+    }
+
+    function renderChoices() {
+      const current = workbookStore.quizData[currentIndex];
+      choiceList.innerHTML = '';
+
+      current.choices.forEach((choice, idx) => {
+        const choiceNumber = idx + 1;
+        const label = document.createElement('label');
+        label.className = 'choice';
+
+        if (userAnswers[currentIndex] === choiceNumber) label.classList.add('selected');
+
+        if (answerVisible) {
+          if (choiceNumber === current.answer) label.classList.add('reveal-correct');
+          if (userAnswers[currentIndex] === choiceNumber && choiceNumber !== current.answer) {
+            label.classList.add('reveal-wrong');
+          }
+        }
+
+        const input = document.createElement('input');
+        input.type = 'radio';
+        input.name = 'choice';
+        input.checked = userAnswers[currentIndex] === choiceNumber;
+        input.addEventListener('change', () => {
+          userAnswers[currentIndex] = choiceNumber;
+          saveAnswersForSheet();
+          render();
+        });
+
+        const text = document.createElement('div');
+        text.innerHTML = `<strong>${choiceNumber}.</strong> ${choice}`;
+
+        label.appendChild(input);
+        label.appendChild(text);
+        choiceList.appendChild(label);
+      });
+    }
+
+    function renderPanels() {
+      const current = workbookStore.quizData[currentIndex];
+      const selected = userAnswers[currentIndex];
+
+      if (gradingDone) {
+        gradeResult.classList.remove('hidden');
+        if (selected === null) {
+          gradeResult.innerHTML = '<strong>채점 결과</strong><br>선택하지 않은 문제입니다.';
+        } else if (selected === current.answer) {
+          gradeResult.innerHTML = '<strong>채점 결과</strong><br>정답입니다. 🎉';
+        } else {
+          gradeResult.innerHTML = '<strong>채점 결과</strong><br>오답입니다.';
+        }
+      } else {
+        gradeResult.classList.add('hidden');
+      }
+
+      if (answerVisible) {
+        answerBox.classList.remove('hidden');
+        answerBox.innerHTML = `<strong>정답</strong><br>${current.answer}번 - ${current.choices[current.answer - 1]}`;
+      } else {
+        answerBox.classList.add('hidden');
+      }
+
+      if (explanationVisible) {
+        explainBox.classList.remove('hidden');
+        explainBox.innerHTML = `<strong>해설</strong><br>${current.explanation.replace(/\n/g, '<br>')}`;
+        toggleExplainBtn.textContent = '해설 숨기기';
+      } else {
+        explainBox.classList.add('hidden');
+        toggleExplainBtn.textContent = '해설 보기';
+      }
+    }
+
+    function updateProgress() {
+      const solvedCount = userAnswers.filter(v => v !== null).length;
+      progressText.textContent = `${solvedCount} / ${workbookStore.quizData.length} 문제 선택`;
+
+      if (gradingDone) {
+        const score = workbookStore.quizData.reduce((sum, q, i) => sum + (userAnswers[i] === q.answer ? 1 : 0), 0);
+        const wrongCount = workbookStore.quizData.reduce((sum, q, i) => sum + (userAnswers[i] !== null && userAnswers[i] !== q.answer ? 1 : 0), 0);
+        scoreText.textContent = `점수: ${score} / ${workbookStore.quizData.length} · 오답 ${wrongCount}개`;
+      } else {
+        scoreText.textContent = '채점 전';
+      }
+    }
+
+    function renderWrongAnswers() {
+      if (!gradingDone) {
+        wrongSection.classList.add('hidden');
+        wrongList.innerHTML = '';
+        wrongExport.value = '';
+        return;
+      }
+
+      const wrongData = buildWrongAnswerData();
+      saveWrongAnswerData(wrongData);
+
+      wrongSection.classList.remove('hidden');
+      if (wrongData.length === 0) {
+        wrongSummary.textContent = '틀린 문제가 없습니다.';
+        wrongList.innerHTML = '';
+        wrongExport.value = '틀린 문제가 없습니다.';
+        return;
+      }
+
+      wrongSummary.textContent = `총 ${wrongData.length}문제 틀렸습니다.`;
+
+      wrongList.innerHTML = wrongData.map(item => `
+        <div class="wrong-item">
+          <strong>${item.number}번</strong>
+          문제: ${item.question}
+
+          보기:
+          1. ${item.choices[0]}
+          2. ${item.choices[1]}
+          3. ${item.choices[2]}
+          4. ${item.choices[3]}
+
+          내가 고른 답: ${item.userAnswer}번 - ${item.userChoiceText}
+          정답: ${item.correctAnswer}번 - ${item.correctChoiceText}
+          해설: ${item.explanation}
+        </div>
+      `).join('');
+
+      wrongExport.value = wrongData.map(item => {
+        return [
+          `${item.number}번`,
+          `문제: ${item.question}`,
+          '보기:',
+          `1. ${item.choices[0]}`,
+          `2. ${item.choices[1]}`,
+          `3. ${item.choices[2]}`,
+          `4. ${item.choices[3]}`,
+          `내가 고른 답: ${item.userAnswer}번 - ${item.userChoiceText}`,
+          `정답: ${item.correctAnswer}번 - ${item.correctChoiceText}`,
+          `해설: ${item.explanation}`
+        ].join('\n');
+      }).join('\n\n--------------------\n\n');
+    }
+
+    function render() {
+      if (!workbookStore.quizData.length) {
+        questionTitle.textContent = '시트를 선택하세요';
+        currentBadge.textContent = '-';
+        questionBox.textContent = '왼쪽에서 원하는 회차를 선택하세요.';
+        choiceList.innerHTML = '';
+        questionGrid.innerHTML = '';
+        progressText.textContent = '0 / 0 문제 선택';
+        scoreText.textContent = '채점 전';
+        wrongSection.classList.add('hidden');
+        return;
+      }
+
+      if (currentIndex >= workbookStore.quizData.length) currentIndex = workbookStore.quizData.length - 1;
+      if (currentIndex < 0) currentIndex = 0;
+
+      const current = workbookStore.quizData[currentIndex];
+      questionTitle.textContent = `${workbookStore.currentSheet} 문제 풀이`;
+      currentBadge.textContent = `${current.number}번`;
+      questionBox.textContent = current.question;
+      sheetInfo.textContent = `${workbookStore.currentSheet} · 총 ${workbookStore.quizData.length}문제`;
+      renderQuestionButtons();
+      renderChoices();
+      renderPanels();
+      updateProgress();
+      renderWrongAnswers();
+      setButtonsEnabled(true);
+    }
+
+    async function loadWorkbookFromPath() {
+      try {
+        const response = await fetch(EXCEL_FILE_PATH);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+        const arrayBuffer = await response.arrayBuffer();
+        const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+
+        workbookStore.workbook = workbook;
+        workbookStore.sheetNames = workbook.SheetNames;
+        workbookStore.currentSheet = '';
+        workbookStore.quizData = [];
+
+        sheetSelect.innerHTML = '<option value="">시트를 선택하세요</option>';
+        workbookStore.sheetNames.forEach((sheetName) => {
+          const option = document.createElement('option');
+          option.value = sheetName;
+          option.textContent = sheetName;
+          sheetSelect.appendChild(option);
+        });
+        sheetSelect.disabled = false;
+
+        questionTitle.textContent = '시트를 선택하세요';
+        questionBox.textContent = '왼쪽에서 원하는 회차 시트를 선택하면 문제가 표시됩니다.';
+      } catch (error) {
+        questionTitle.textContent = '엑셀 파일을 불러오지 못했습니다';
+        questionBox.textContent = `파일 경로를 확인하세요.\n현재 경로: ${EXCEL_FILE_PATH}`;
+        sheetInfo.textContent = '파일 로드 실패';
+        setButtonsEnabled(false);
+      }
+    }
+
+    sheetSelect.addEventListener('change', (event) => {
+      const sheetName = event.target.value;
+      if (!sheetName || !workbookStore.workbook) return;
+
+      const sheet = workbookStore.workbook.Sheets[sheetName];
+      const parsed = parseSheetToQuizData(sheet);
+
+      workbookStore.currentSheet = sheetName;
+      workbookStore.quizData = parsed;
+      currentIndex = 0;
+      gradingDone = false;
+      resetViewToggles();
+      loadAnswersForSheet(sheetName);
+      render();
+    });
+
+    gradeBtn.addEventListener('click', () => {
+      gradingDone = true;
+      render();
+    });
+
+    showAnswerBtn.addEventListener('click', () => {
+      answerVisible = !answerVisible;
+      showAnswerBtn.textContent = answerVisible ? '정답 숨기기' : '정답 보기';
+      render();
+    });
+
+    toggleExplainBtn.addEventListener('click', () => {
+      explanationVisible = !explanationVisible;
+      render();
+    });
+
+    prevBtn.addEventListener('click', () => {
+      if (currentIndex > 0) {
+        currentIndex -= 1;
+        resetViewToggles();
+        render();
+      }
+    });
+
+    nextBtn.addEventListener('click', () => {
+      if (currentIndex < workbookStore.quizData.length - 1) {
+        currentIndex += 1;
+        resetViewToggles();
+        render();
+      }
+    });
+
+    showWrongBtn.addEventListener('click', () => {
+      if (!gradingDone) return;
+      wrongSection.classList.remove('hidden');
+      wrongSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+
+    setButtonsEnabled(false);
+    loadWorkbookFromPath();
+    render();
+  </script>
+</body>
+</html>
