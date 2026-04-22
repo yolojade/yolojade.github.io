@@ -1,79 +1,80 @@
 <!doctype html>
 <html lang="ko">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>PDF 다운로드 테스트</title>
-  <style>
-    * {
-      box-sizing: border-box;
-    }
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>PDF 다운로드 테스트</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
 
-    body {
-      margin: 0;
-      min-height: 100vh;
-      font-family: Arial, "Malgun Gothic", sans-serif;
-      color: #1f2937;
-      background: #f4f7fb;
-      display: grid;
-      place-items: center;
-      padding: 24px;
-    }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: Arial, "Malgun Gothic", sans-serif;
+        color: #1f2937;
+        background: #f4f7fb;
+        display: grid;
+        place-items: center;
+        padding: 24px;
+      }
 
-    main {
-      width: min(100%, 520px);
-      background: #ffffff;
-      border: 1px solid #d9e2ef;
-      border-radius: 8px;
-      padding: 28px;
-      box-shadow: 0 18px 45px rgba(37, 55, 99, 0.12);
-    }
+      main {
+        width: min(100%, 520px);
+        background: #ffffff;
+        border: 1px solid #d9e2ef;
+        border-radius: 8px;
+        padding: 28px;
+        box-shadow: 0 18px 45px rgba(37, 55, 99, 0.12);
+      }
 
-    h1 {
-      margin: 0 0 10px;
-      font-size: 28px;
-      line-height: 1.2;
-    }
+      h1 {
+        margin: 0 0 10px;
+        font-size: 28px;
+        line-height: 1.2;
+      }
 
-    p {
-      margin: 0 0 22px;
-      color: #5b677a;
-      line-height: 1.55;
-    }
+      p {
+        margin: 0 0 22px;
+        color: #5b677a;
+        line-height: 1.55;
+      }
 
-    .file-info {
-      min-height: 24px;
-      margin: 18px 0;
-      color: #334155;
-      font-size: 15px;
-      word-break: break-word;
-    }
+      .file-info {
+        min-height: 24px;
+        margin: 18px 0;
+        color: #334155;
+        font-size: 15px;
+        word-break: break-word;
+      }
 
-    .download-link {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 44px;
-      padding: 0 18px;
-      border-radius: 6px;
-      background: #2563eb;
-      color: #ffffff;
-      font-weight: 700;
-      text-decoration: none;
-    }
-  </style>
-</head>
-<body>
-  <main>
-    <h1>PDF 다운로드 테스트</h1>
-    <p>아래 버튼을 누르면 준비된 PDF 파일을 다운로드할 수 있습니다.</p>
+      .download-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 44px;
+        padding: 0 18px;
+        border-radius: 6px;
+        background: #2563eb;
+        color: #ffffff;
+        font-weight: 700;
+        text-decoration: none;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>PDF 다운로드 테스트</h1>
+      <p>아래 버튼을 누르면 준비된 PDF 파일을 다운로드할 수 있습니다.</p>
 
-    <div class="file-info">파일: python-1.pdf</div>
-    <a
-      class="download-link"
-      href="https://yolojade.github.io/files/python-1.pdf"
-      download="python-1.pdf"
-    >PDF 다운로드</a>
-  </main>
-</body>
+      <div class="file-info">파일: python-1.pdf</div>
+      <a
+        class="download-link"
+        href="https://yolojade.github.io/files/python-1.pdf"
+        download="python-1.pdf"
+        >PDF 다운로드</a
+      >
+    </main>
+  </body>
 </html>
