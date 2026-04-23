@@ -72,12 +72,17 @@ function output_(obj, callback) {
 }
 
 function handleCbtQuizSubmission_(ss, payload) {
+  var studentName = String(payload.studentName || "").trim();
   var sheetName = String(payload.sheetName || "").trim();
   var questions = Array.isArray(payload.questions) ? payload.questions : [];
   var userAnswers = Array.isArray(payload.userAnswers) ? payload.userAnswers : [];
   var wrongData = Array.isArray(payload.wrongData) ? payload.wrongData : [];
   var resultSummary = payload.resultSummary && typeof payload.resultSummary === "object" ? payload.resultSummary : null;
   var reportText = String(payload.reportText || "");
+
+  if (!studentName) {
+    return { success: false, message: "studentName이 없습니다." };
+  }
 
   if (!sheetName) {
     return { success: false, message: "sheetName이 없습니다." };
@@ -130,12 +135,15 @@ function handleCbtQuizSubmission_(ss, payload) {
   var logSheet = getOrCreateQuizSubmissionsSheet_(ss);
   var wrongSheet = getOrCreateQuizWrongAnswersSheet_(ss);
   var wrongStartRow = "";
+  var wrongSummaryText = wrongNumbers.length ? wrongNumbers.join(",") : "없음";
+  var wrongDetailText = buildWrongDetailText_(wrongData);
 
   if (wrongData.length) {
     wrongStartRow = wrongSheet.getLastRow() + 1;
     var wrongRows = wrongData.map(function(item) {
       return [
         submissionId,
+        studentName,
         sheetName,
         Number(item.number || ""),
         String(item.question || ""),
@@ -144,6 +152,7 @@ function handleCbtQuizSubmission_(ss, payload) {
         Number(item.correctAnswer || ""),
         String(item.correctChoiceText || ""),
         String(item.explanation || ""),
+        buildWrongRowSummary_(item),
         submittedAt,
         now
       ];
@@ -165,6 +174,7 @@ function handleCbtQuizSubmission_(ss, payload) {
 
   logSheet.appendRow([
     submissionId,
+    studentName,
     sheetName,
     totalCount,
     correctCount,
@@ -172,6 +182,8 @@ function handleCbtQuizSubmission_(ss, payload) {
     score,
     correctNumbers.join(","),
     wrongNumbers.join(","),
+    wrongSummaryText,
+    wrongDetailText,
     wrongSheetLink,
     reportText,
     JSON.stringify(userAnswers),
@@ -183,6 +195,7 @@ function handleCbtQuizSubmission_(ss, payload) {
     success: true,
     message: "제출이 저장되었습니다.",
     submissionId: submissionId,
+    studentName: studentName,
     sheetName: sheetName,
     totalCount: totalCount,
     correctCount: correctCount,
@@ -198,6 +211,7 @@ function getOrCreateQuizSubmissionsSheet_(ss) {
   var sheet = ss.getSheetByName("QuizSubmissions");
   var headers = [
     "submissionId",
+    "studentName",
     "sheetName",
     "totalCount",
     "correctCount",
@@ -205,6 +219,8 @@ function getOrCreateQuizSubmissionsSheet_(ss) {
     "score",
     "correctNumbers",
     "wrongNumbers",
+    "wrongSummaryText",
+    "wrongDetailText",
     "wrongSheetLink",
     "reportText",
     "userAnswers",
@@ -228,6 +244,7 @@ function getOrCreateQuizWrongAnswersSheet_(ss) {
   var sheet = ss.getSheetByName("QuizWrongAnswers");
   var headers = [
     "submissionId",
+    "studentName",
     "sheetName",
     "questionNumber",
     "question",
@@ -236,6 +253,7 @@ function getOrCreateQuizWrongAnswersSheet_(ss) {
     "correctAnswer",
     "correctChoiceText",
     "explanation",
+    "wrongSummaryText",
     "submittedAt",
     "createdAt"
   ];
@@ -256,4 +274,26 @@ function setupQuizSheets() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   getOrCreateQuizSubmissionsSheet_(ss);
   getOrCreateQuizWrongAnswersSheet_(ss);
+}
+
+function buildWrongRowSummary_(item) {
+  var userAnswerText = item.userAnswer === null
+    ? "미응답"
+    : item.userAnswer + "번 - " + String(item.userChoiceText || "");
+  return [
+    item.number + "번",
+    "문제: " + String(item.question || ""),
+    "내 답: " + userAnswerText,
+    "정답: " + String(item.correctAnswer || "") + "번 - " + String(item.correctChoiceText || ""),
+    "해설: " + String(item.explanation || "")
+  ].join("\n");
+}
+
+function buildWrongDetailText_(wrongData) {
+  if (!wrongData.length) return "틀린 문제가 없습니다.";
+  return wrongData.map(function(item) {
+    return String(item.number || "");
+  }).filter(function(numberText) {
+    return numberText !== "";
+  }).join(",");
 }
