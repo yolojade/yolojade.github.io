@@ -506,9 +506,9 @@
         <div class="api-input-row">
           <input
             class="api-input"
-            type="password"
+            type="text"
             id="apiKeyInput"
-            placeholder="AIzaSy..."
+            value="AIzaSyBXrRG8oOBGc4xPBq-W6IBytjEFwsvn7VI"
           />
           <button class="api-save-btn" onclick="saveApiKey()">저장</button>
         </div>
@@ -683,9 +683,17 @@
 
       window.onload = function () {
         const saved = localStorage.getItem("gemini_api_key");
+        const defaultKey = "AIzaSyBXrRG8oOBGc4xPBq-W6IBytjEFwsvn7VI";
         if (saved) {
           document.getElementById("apiKeyInput").value = saved;
           showApiStatus("ok", "✅ 저장된 API 키가 있어요. 바로 사용 가능해요!");
+        } else {
+          document.getElementById("apiKeyInput").value = defaultKey;
+          localStorage.setItem("gemini_api_key", defaultKey);
+          showApiStatus(
+            "ok",
+            "✅ 기본 API 키를 자동 저장했어요. 바로 사용 가능해요!",
+          );
         }
       };
 
@@ -771,7 +779,7 @@
 - 이모지 1~2개 적절히 사용`;
 
         try {
-          const url = `https://generativelanguage.googleapis.com/v1beta1/models/text-bison-001:generateText?key=${apiKey}`;
+          const url = `https://generativelanguage.googleapis.com/v1beta2/models/text-bison-001:generateText?key=${apiKey}`;
           const response = await fetch(url, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -786,6 +794,12 @@
             const err = await response.json().catch(() => ({}));
             if (response.status === 400)
               throw new Error("API 키가 올바르지 않아요. 다시 확인해 주세요.");
+            if (response.status === 401)
+              throw new Error("인증 오류입니다. API 키를 확인해 주세요.");
+            if (response.status === 403)
+              throw new Error(
+                "API 사용 권한이 없습니다. 키 제한 또는 API 활성화를 확인해 주세요.",
+              );
             if (response.status === 429)
               throw new Error(
                 "요청 한도를 초과했어요. 잠시 후 다시 시도해 주세요.",
@@ -808,10 +822,12 @@
               .scrollIntoView({ behavior: "smooth", block: "start" });
           }, 100);
         } catch (e) {
-          showError(
-            e.message ||
-              "생성 중 오류가 발생했어요. 잠시 후 다시 시도해 주세요.",
-          );
+          const message =
+            e.message && e.message.includes("Failed to fetch")
+              ? "네트워크 또는 브라우저에서 API 요청이 차단되었어요. 인터넷 연결과 API 키 제한(웹 참조 제한)을 확인해 주세요."
+              : e.message ||
+                "생성 중 오류가 발생했어요. 잠시 후 다시 시도해 주세요.";
+          showError(message);
         } finally {
           btn.disabled = false;
           btn.innerHTML = "✨ AI 피드백 생성하기";
