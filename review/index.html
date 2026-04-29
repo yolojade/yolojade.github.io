@@ -779,14 +779,25 @@
 - 이모지 1~2개 적절히 사용`;
 
         try {
-          const url = `https://generativelanguage.googleapis.com/v1beta2/models/text-bison-001:generateText?key=${apiKey}`;
+          const url =
+            "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
           const response = await fetch(url, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: {
+              "Content-Type": "application/json",
+              "x-goog-api-key": apiKey,
+            },
             body: JSON.stringify({
-              prompt: { text: prompt },
-              temperature: 0.8,
-              maxOutputTokens: 1000,
+              contents: [
+                {
+                  role: "user",
+                  parts: [{ text: prompt }],
+                },
+              ],
+              generationConfig: {
+                temperature: 0.8,
+                maxOutputTokens: 1000,
+              },
             }),
           });
 
@@ -804,13 +815,21 @@
               throw new Error(
                 "요청 한도를 초과했어요. 잠시 후 다시 시도해 주세요.",
               );
+            if (err?.error?.message?.includes("not found"))
+              throw new Error(
+                "요청한 AI 모델을 찾을 수 없어요. Gemini 모델 설정을 확인해 주세요.",
+              );
             throw new Error(
               err?.error?.message || `오류 코드: ${response.status}`,
             );
           }
 
           const data = await response.json();
-          const text = data?.candidates?.[0]?.output || "";
+          const text =
+            data?.candidates?.[0]?.content?.parts
+              ?.map((part) => part.text || "")
+              .join("")
+              .trim() || "";
           if (!text) throw new Error("응답이 비어있어요. 다시 시도해 주세요.");
 
           document.getElementById("resultNameTag").textContent = name;
