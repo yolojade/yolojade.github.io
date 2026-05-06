@@ -755,7 +755,7 @@
         btn.disabled = true;
         btn.innerHTML = '<div class="loading-spinner"></div> 생성 중...';
 
-        const prompt = `너는 코딩컴퓨터학원 원장이야. 아래 학생 정보를 바탕으로 학부모에게 전달할 월간 피드백을 작성해줘.
+        const prompt = `너는 컴벤져스 컴퓨터&코딩 입시학원 원장이야. 아래 학생 정보를 바탕으로 학부모에게 전달할 월간 피드백을 작성해줘.
 
 학생 정보:
 - 이름: ${name}
@@ -776,30 +776,50 @@
 - 이모지 1~2개 적절히 사용`;
 
         try {
-          const url =
-            "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent";
-          const response = await fetch(url, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "x-goog-api-key": apiKey,
-            },
-            body: JSON.stringify({
-              contents: [
-                {
-                  role: "user",
-                  parts: [{ text: prompt }],
-                },
-              ],
-              generationConfig: {
-                temperature: 0.8,
-                maxOutputTokens: 1000,
-              },
-            }),
-          });
+          const models = ["gemini-2.5-flash-lite", "gemini-2.5-flash"];
+          let lastError = null;
+          let data = null;
 
-          if (!response.ok) {
+          for (const model of models) {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
+            const response = await fetch(url, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "x-goog-api-key": apiKey,
+              },
+              body: JSON.stringify({
+                contents: [
+                  {
+                    role: "user",
+                    parts: [{ text: prompt }],
+                  },
+                ],
+                generationConfig: {
+                  temperature: 0.8,
+                  maxOutputTokens: 1000,
+                },
+              }),
+            });
+
+            if (response.ok) {
+              data = await response.json();
+              break;
+            }
+
             const err = await response.json().catch(() => ({}));
+            const apiMessage = err?.error?.message || "";
+            const canRetryWithNextModel =
+              response.status === 429 ||
+              response.status === 503 ||
+              apiMessage.includes("high demand") ||
+              apiMessage.includes("overloaded");
+
+            if (canRetryWithNextModel && model !== models[models.length - 1]) {
+              lastError = new Error(apiMessage);
+              continue;
+            }
+
             if (response.status === 400)
               throw new Error("API 키가 올바르지 않아요. 다시 확인해 주세요.");
             if (response.status === 401)
@@ -810,18 +830,20 @@
               );
             if (response.status === 429)
               throw new Error(
-                "요청 한도를 초과했어요. 잠시 후 다시 시도해 주세요.",
+                "무료 요청 한도 또는 사용량이 잠시 초과됐어요. 잠시 후 다시 시도해 주세요.",
               );
-            if (err?.error?.message?.includes("not found"))
+            if (response.status === 503 || apiMessage.includes("high demand"))
+              throw new Error(
+                "AI 모델 사용량이 많아 잠시 응답이 지연되고 있어요. 조금 뒤 다시 시도해 주세요.",
+              );
+            if (apiMessage.includes("not found"))
               throw new Error(
                 "요청한 AI 모델을 찾을 수 없어요. Gemini 모델 설정을 확인해 주세요.",
               );
-            throw new Error(
-              err?.error?.message || `오류 코드: ${response.status}`,
-            );
+            throw new Error(apiMessage || `오류 코드: ${response.status}`);
           }
 
-          const data = await response.json();
+          if (!data && lastError) throw lastError;
           const text =
             data?.candidates?.[0]?.content?.parts
               ?.map((part) => part.text || "")

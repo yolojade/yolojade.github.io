@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Google Sheet 메시지 저장</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 480px;
+        margin: 60px auto;
+        padding: 20px;
+        background: #f7f7f7;
+      }
+
+      .box {
+        background: white;
+        padding: 24px;
+        border-radius: 16px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      }
+
+      h1 {
+        font-size: 24px;
+        margin-bottom: 20px;
+      }
+
+      label {
+        display: block;
+        margin-top: 14px;
+        font-weight: bold;
+      }
+
+      input,
+      textarea,
+      button {
+        width: 100%;
+        box-sizing: border-box;
+        margin-top: 8px;
+        padding: 12px;
+        font-size: 16px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+      }
+
+      textarea {
+        height: 120px;
+        resize: none;
+      }
+
+      button {
+        margin-top: 20px;
+        background: #2563eb;
+        color: white;
+        border: none;
+        cursor: pointer;
+      }
+
+      button:disabled {
+        background: #999;
+      }
+
+      #result {
+        margin-top: 16px;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box">
+      <h1>메시지 저장하기</h1>
+
+      <form id="messageForm">
+        <label for="name">이름</label>
+        <input type="text" id="name" placeholder="이름을 입력하세요" required />
+
+        <label for="message">메시지</label>
+        <textarea
+          id="message"
+          placeholder="메시지를 입력하세요"
+          required
+        ></textarea>
+
+        <button type="submit" id="submitBtn">저장하기</button>
+      </form>
+
+      <div id="result"></div>
+    </div>
+
+    <script>
+      const WEB_APP_URL =
+        "https://script.google.com/macros/s/AKfycbyfRDX57LRlWTvect9RRrc5oKs-Kk1eRTfzVA-vqfz0l061cqzHe-1QzI1SHK_lxQCj/exec";
+
+      const form = document.getElementById("messageForm");
+      const submitBtn = document.getElementById("submitBtn");
+      const result = document.getElementById("result");
+
+      form.addEventListener("submit", async function (e) {
+        e.preventDefault();
+
+        const name = document.getElementById("name").value.trim();
+        const message = document.getElementById("message").value.trim();
+
+        if (!name || !message) {
+          result.textContent = "이름과 메시지를 모두 입력해주세요.";
+          return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = "저장 중...";
+        result.textContent = "";
+
+        try {
+          await fetch(WEB_APP_URL, {
+            method: "POST",
+            mode: "no-cors",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              name: name,
+              message: message,
+            }),
+          });
+
+          result.textContent = "저장 요청이 전송되었습니다.";
+          form.reset();
+        } catch (error) {
+          result.textContent = "저장 중 오류가 발생했습니다.";
+          console.error(error);
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.textContent = "저장하기";
+        }
+      });
+    </script>
+  </body>
+</html>
