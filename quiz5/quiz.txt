@@ -1,0 +1,128 @@
+from pathlib import Path
+
+content = """1
+page = input()+"p"     # 40입력
+print(page)
+===
+40p
+
+2
+num = int(input())    # 50입력
+print(num-20)
+===
+30
+
+3
+a=int(input())+10    # 4 입력
+print(a)
+===
+14
+
+4
+print("hello", "python")
+===
+hello python
+
+5
+print("안녕"+"파이썬")
+===
+안녕파이썬
+
+6
+print("나는", 3, "학년")
+===
+나는 3 학년
+
+7
+x=10
+y=20
+print(x, y, sep="/")
+===
+10/20
+
+8
+x="A"
+y="B"
+print(x, y, sep="-")
+===
+A-B
+
+9
+x="key"
+y="word"
+print(x, y, sep="+")
+===
+key+word
+
+10
+print("hi", end=" ")
+print("hello")
+===
+hi hello
+
+11
+print("A", end=" s ")
+print("B")
+===
+A s B
+
+12
+x = "Apple"
+y = "Banana"
+print(x[1]+y[2], end="-")
+===
+pn-
+
+13
+print(float(5))
+===
+5.0
+
+14
+print(int(10.5)+20)
+===
+30
+
+15
+print(str(10)+"10")
+===
+1010
+
+16
+a=3.14
+b=5
+print("%f" %(a+float(b)))
+===
+8.140000
+
+17
+print("%02d %.2f" %(5, 7.777))
+===
+05 7.78
+
+18
+a=int(3.222+2.555)
+print("%04d" %a)
+===
+0005
+
+19
+y=int(input())   # 7 입력
+print("%05d" %y)
+===
+00007
+
+20
+a="3"+input()     #  12 입력
+b=int(input())+56     # 4 입력
+c=a+str(b)
+d=int(c)
+print("%08d" %d, end="x")
+===
+00031260x
+"""
+
+path = Path("/mnt/data/input_print_quiz.txt")
+path.write_text(content, encoding="utf-8")
+
+print("Created:", path)
