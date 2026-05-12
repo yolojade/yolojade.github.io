@@ -1,6 +1,4 @@
-from pathlib import Path
-
-content = """1
+1
 page = input()+"p"     # 40입력
 print(page)
 ===
@@ -120,9 +118,3 @@ d=int(c)
 print("%08d" %d, end="x")
 ===
 00031260x
-"""
-
-path = Path("/mnt/data/input_print_quiz.txt")
-path.write_text(content, encoding="utf-8")
-
-print("Created:", path)
