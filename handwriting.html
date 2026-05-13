@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>글씨 연습장 생성기</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: #f3f4f6;
+      font-family: "Noto Sans KR", "Malgun Gothic", sans-serif;
+      color: #111827;
+    }
+
+    .app {
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: 24px;
+      padding: 24px;
+      align-items: start;
+    }
+
+    .panel {
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
+      position: sticky;
+      top: 24px;
+    }
+
+    .panel h1 {
+      margin: 0 0 8px;
+      font-size: 22px;
+      line-height: 1.3;
+    }
+
+    .panel p {
+      margin: 0 0 20px;
+      color: #6b7280;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    label {
+      display: block;
+      margin: 14px 0 7px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+    }
+
+    textarea {
+      min-height: 110px;
+      resize: vertical;
+      line-height: 1.6;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .button-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .primary {
+      background: #1d4ed8;
+      color: white;
+    }
+
+    .secondary {
+      background: #e5e7eb;
+      color: #111827;
+    }
+
+    .hint {
+      margin-top: 14px;
+      font-size: 12px;
+      color: #6b7280;
+      line-height: 1.6;
+    }
+
+    .test-status {
+      margin-top: 12px;
+      padding: 10px;
+      border-radius: 10px;
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      font-size: 12px;
+      color: #374151;
+      line-height: 1.5;
+    }
+
+    .preview-wrap {
+      overflow: auto;
+      padding-bottom: 24px;
+    }
+
+    .paper {
+      width: 210mm;
+      min-height: 297mm;
+      margin: 0 auto;
+      background: white;
+      padding: 18mm 16mm 14mm;
+      box-shadow: 0 16px 45px rgba(0, 0, 0, 0.12);
+      position: relative;
+    }
+
+    .title {
+      text-align: center;
+      font-family: "Nanum Myeongjo", "Batang", serif;
+      font-size: 18px;
+      letter-spacing: 0.2em;
+      margin-bottom: 10px;
+    }
+
+    .name-row {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      margin-bottom: 5px;
+      font-family: "Batang", serif;
+      font-size: 11px;
+    }
+
+    .name-line {
+      display: inline-block;
+      width: 42mm;
+      border-bottom: 1px dashed #999;
+      margin-left: 5px;
+      height: 14px;
+    }
+
+    .practice-table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+
+    .practice-table td {
+      border: 1px solid #333;
+      height: var(--cell-height);
+      position: relative;
+      text-align: center;
+      vertical-align: middle;
+      overflow: hidden;
+    }
+
+    .practice-table td::before,
+    .practice-table td::after {
+      content: "";
+      position: absolute;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .practice-table td::before {
+      left: 0;
+      right: 0;
+      top: 50%;
+      border-top: 1px dotted #c9c9c9;
+    }
+
+    .practice-table td::after {
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      border-left: 1px dotted #c9c9c9;
+    }
+
+    .char {
+      position: relative;
+      z-index: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      font-family: var(--practice-font-family);
+      font-size: var(--font-size);
+      line-height: 1;
+      color: rgba(0, 0, 0, var(--ink-opacity));
+      font-weight: 400;
+      white-space: pre;
+    }
+
+    .footer {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 8mm;
+      text-align: center;
+      font-family: "Batang", serif;
+      font-size: 10px;
+      color: #555;
+    }
+
+    .screen-only {
+      display: block;
+    }
+
+    @page {
+      size: A4 portrait;
+      margin: 0;
+    }
+
+    @media print {
+      body {
+        background: white;
+      }
+
+      .screen-only,
+      .panel {
+        display: none !important;
+      }
+
+      .app {
+        display: block;
+        padding: 0;
+      }
+
+      .preview-wrap {
+        padding: 0;
+        overflow: visible;
+      }
+
+      .paper {
+        width: 210mm;
+        height: 297mm;
+        min-height: 297mm;
+        margin: 0;
+        padding: 18mm 16mm 14mm;
+        box-shadow: none;
+        page-break-after: always;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="panel screen-only">
+      <h1>글씨 연습장 생성기</h1>
+      <p>여러 문장을 줄바꿈으로 입력하면 문장별로 반복되고, 긴 문장은 10칸씩 나눈 뒤 각 줄을 반복합니다.</p>
+
+      <label for="titleInput">제목</label>
+      <input id="titleInput" value="펜글씨 연습" />
+
+      <label for="textInput">연습 문장</label>
+      <textarea id="textInput">봄여름가을겨울
+하늘땅 별바람</textarea>
+
+      <div class="row">
+        <div>
+          <label for="colCount">한 줄 칸 수</label>
+          <input id="colCount" type="number" min="4" max="20" value="10" />
+        </div>
+        <div>
+          <label for="repeatCount">문장별 반복 횟수</label>
+          <input id="repeatCount" type="number" min="1" max="10" value="5" />
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="cellHeight">칸 높이(mm)</label>
+          <input id="cellHeight" type="number" min="8" max="22" value="14" />
+        </div>
+        <div>
+          <label for="fontSize">글자 크기(px)</label>
+          <input id="fontSize" type="number" min="18" max="48" value="30" />
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="guideRows">진한 줄 수</label>
+          <input id="guideRows" type="number" min="1" max="5" value="1" />
+        </div>
+        <div>
+          <label for="pageNo">페이지 번호</label>
+          <input id="pageNo" type="number" min="1" max="99" value="1" />
+        </div>
+      </div>
+
+      <label for="fontFamily">글씨체</label>
+      <select id="fontFamily">
+        <option value="Batang, serif" selected>바탕체 - 기본 글씨 연습</option>
+        <option value="Gungsuh, serif">궁서체 - 또박또박한 느낌</option>
+        <option value="Malgun Gothic, sans-serif">맑은 고딕 - 깔끔한 느낌</option>
+        <option value="Nanum Myeongjo, Batang, serif">명조 계열 - 책 글씨 느낌</option>
+        <option value="Arial, sans-serif">영문 기본체 - 알파벳 연습</option>
+        <option value="custom">내 PC 글씨체 직접 입력</option>
+      </select>
+
+      <div id="customFontBox" style="display:none;">
+        <label for="customFontName">내 PC 글씨체 이름</label>
+        <input id="customFontName" placeholder="예: 나눔손글씨 펜, KoPub바탕체, HY견고딕" />
+        <div class="hint">
+          PC에 설치된 글꼴 이름을 정확히 입력하면 적용됩니다. 브라우저 보안상 전체 글꼴 목록을 자동으로 불러오기는 어렵습니다.
+        </div>
+      </div>
+
+      <label for="opacityMode">따라쓰기 농도</label>
+      <select id="opacityMode">
+        <option value="fade" selected>첫 줄 진하게, 아래로 갈수록 흐리게</option>
+        <option value="same">전체 같은 흐림</option>
+        <option value="blank">첫 줄만 제시하고 나머지는 빈칸</option>
+      </select>
+
+      <div class="button-row">
+        <button class="primary" type="button" onclick="renderPractice()">미리보기 적용</button>
+        <button class="secondary" type="button" onclick="window.print()">A4 인쇄</button>
+      </div>
+
+      <div class="hint">
+        입력 예시:<br>
+        봄여름가을겨울<br>
+        하늘땅 별바람<br><br>
+        출력 예시:<br>
+        긴 문장은 10칸씩 나눔<br>
+        첫 10칸을 5회 반복<br>
+        다음 10칸을 5회 반복<br><br>
+        출력 팁: 인쇄 창에서 배율은 100%, 여백은 없음 또는 기본값으로 설정하세요. 크롬 사용을 추천합니다.
+      </div>
+
+      <div class="test-status" id="testStatus">테스트 준비 중...</div>
+    </aside>
+
+    <main class="preview-wrap">
+      <section class="paper" id="paper">
+        <div class="title" id="paperTitle">펜글씨 연습</div>
+        <div class="name-row">이름 <span class="name-line"></span></div>
+        <table class="practice-table" id="practiceTable"></table>
+        <div class="footer" id="footerPage">- 1 -</div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+
+    function splitChars(text) {
+      return Array.from(String(text).replace(/\n/g, " ")).filter((ch) => ch !== "");
+    }
+
+    function splitLines(text) {
+      return String(text)
+        .split(/\n+/)
+        .map((line) => line.trim())
+        .filter((line) => line.length > 0);
+    }
+
+    function chunkChars(chars, colCount) {
+      const chunks = [];
+      for (let i = 0; i < chars.length; i += colCount) {
+        chunks.push(chars.slice(i, i + colCount));
+      }
+      return chunks.length > 0 ? chunks : [[]];
+    }
+
+    function makePracticeRows(lines, repeatCount, colCount) {
+      const rows = [];
+      lines.forEach((line) => {
+        const chars = splitChars(line);
+        const chunks = chunkChars(chars, colCount);
+
+        chunks.forEach((chunk, chunkIndex) => {
+          for (let repeatIndex = 0; repeatIndex < repeatCount; repeatIndex++) {
+            rows.push({ chars: chunk, repeatIndex, chunkIndex });
+          }
+        });
+      });
+      return rows;
+    }
+
+    function getOpacity(rowIndex, guideRows, mode) {
+      if (mode === "blank") {
+        return rowIndex < guideRows ? 1 : 0;
+      }
+
+      if (mode === "same") {
+        return rowIndex < guideRows ? 1 : 0.18;
+      }
+
+      if (rowIndex < guideRows) return 1;
+
+      const fadeValues = [0.22, 0.17, 0.13, 0.1, 0.08, 0.06, 0.05, 0.04, 0.035, 0.03];
+      return fadeValues[Math.min(rowIndex - guideRows, fadeValues.length - 1)];
+    }
+
+    function clampNumber(value, min, max, fallback) {
+      const num = Number(value);
+      if (Number.isNaN(num)) return fallback;
+      return Math.max(min, Math.min(max, num));
+    }
+
+    function getPracticeFontFamily() {
+      const selectedFont = $("fontFamily").value;
+      if (selectedFont === "custom") {
+        const customFontName = $("customFontName").value.trim();
+        return customFontName ? `"${customFontName}", Batang, serif` : "Batang, serif";
+      }
+      return selectedFont;
+    }
+
+    function toggleCustomFontBox() {
+      const isCustom = $("fontFamily").value === "custom";
+      $("customFontBox").style.display = isCustom ? "block" : "none";
+    }
+
+    function renderPractice() {
+      const title = $("titleInput").value.trim() || "펜글씨 연습";
+      const text = $("textInput").value || "";
+      const lines = splitLines(text);
+      const repeatCount = clampNumber($("repeatCount").value, 1, 10, 5);
+      const colCount = clampNumber($("colCount").value, 4, 20, 10);
+      const practiceRows = makePracticeRows(lines, repeatCount, colCount);
+      const cellHeight = clampNumber($("cellHeight").value, 8, 22, 14);
+      const fontSize = clampNumber($("fontSize").value, 18, 48, 30);
+      const guideRows = clampNumber($("guideRows").value, 1, 5, 1);
+      const pageNo = clampNumber($("pageNo").value, 1, 99, 1);
+      const mode = $("opacityMode").value;
+      const fontFamily = getPracticeFontFamily();
+      toggleCustomFontBox();
+
+      $("paperTitle").textContent = title;
+      $("footerPage").textContent = `- ${pageNo} -`;
+
+      const table = $("practiceTable");
+      table.innerHTML = "";
+      table.style.setProperty("--cell-height", `${cellHeight}mm`);
+      table.style.setProperty("--font-size", `${fontSize}px`);
+      table.style.setProperty("--practice-font-family", fontFamily);
+
+      const rowsToRender = practiceRows.length > 0 ? practiceRows : [[]];
+
+      for (let r = 0; r < rowsToRender.length; r++) {
+        const tr = document.createElement("tr");
+        const rowData = rowsToRender[r];
+        const rowChars = Array.isArray(rowData) ? rowData : rowData.chars;
+        const lineRepeatIndex = Array.isArray(rowData) ? 0 : rowData.repeatIndex;
+        const opacity = getOpacity(lineRepeatIndex, guideRows, mode);
+
+        for (let c = 0; c < colCount; c++) {
+          const td = document.createElement("td");
+          const span = document.createElement("span");
+          span.className = "char";
+          span.style.setProperty("--ink-opacity", opacity);
+          span.textContent = rowChars[c] || "";
+          td.appendChild(span);
+          tr.appendChild(td);
+        }
+
+        table.appendChild(tr);
+      }
+    }
+
+    function assertEqual(actual, expected, message) {
+      const actualJson = JSON.stringify(actual);
+      const expectedJson = JSON.stringify(expected);
+      if (actualJson !== expectedJson) {
+        throw new Error(`${message}\nexpected: ${expectedJson}\nactual: ${actualJson}`);
+      }
+    }
+
+    function assertTrue(condition, message) {
+      if (!condition) {
+        throw new Error(message);
+      }
+    }
+
+    function runSelfTests() {
+      const tests = [];
+
+      tests.push(() => {
+        assertEqual(
+          splitChars("봄\n여름"),
+          ["봄", " ", "여", "름"],
+          "splitChars should safely replace newline with a space"
+        );
+      });
+
+      tests.push(() => {
+        assertEqual(
+          splitLines("봄여름가을겨울\n하늘땅 별바람\n\n"),
+          ["봄여름가을겨울", "하늘땅 별바람"],
+          "splitLines should split multiple practice sentences"
+        );
+      });
+
+      tests.push(() => {
+        const rows = makePracticeRows(["봄여름", "가을겨울"], 2, 10);
+        assertTrue(rows.length === 4, "makePracticeRows should repeat each sentence by repeatCount");
+        assertEqual(rows[0].chars, ["봄", "여", "름"], "first sentence row should be split into characters");
+        assertEqual(rows[2].chars, ["가", "을", "겨", "울"], "second sentence row should start after first repeated rows");
+      });
+
+      tests.push(() => {
+        const chunks = chunkChars(splitChars("가나다라마바사아자차카"), 10);
+        assertEqual(
+          chunks,
+          [["가", "나", "다", "라", "마", "바", "사", "아", "자", "차"], ["카"]],
+          "chunkChars should automatically wrap long text by colCount"
+        );
+      });
+
+      tests.push(() => {
+        const wrappedRows = makePracticeRows(["가나다라마바사아자차카"], 2, 10);
+        assertTrue(wrappedRows.length === 4, "a long sentence should wrap and repeat each 10-cell chunk before the next chunk");
+        assertEqual(wrappedRows[0].chars, ["가", "나", "다", "라", "마", "바", "사", "아", "자", "차"], "first wrapped row should contain 10 cells");
+        assertEqual(wrappedRows[1].chars, ["가", "나", "다", "라", "마", "바", "사", "아", "자", "차"], "first 10-cell chunk should repeat before moving to the next chunk");
+        assertEqual(wrappedRows[2].chars, ["카"], "remaining characters should appear after the first chunk is fully repeated");
+        assertEqual(wrappedRows[3].chars, ["카"], "remaining character chunk should also repeat");
+        assertTrue(wrappedRows[2].chunkIndex === 1, "remaining character row should have chunkIndex 1");
+      });
+
+      tests.push(() => {
+        assertTrue(getOpacity(0, 1, "blank") === 1, "blank mode first guide row should be visible");
+        assertTrue(getOpacity(1, 1, "blank") === 0, "blank mode non-guide rows should be hidden");
+      });
+
+      tests.push(() => {
+        assertTrue(
+          typeof $("fontFamily").value === "string" && $("fontFamily").value.length > 0,
+          "fontFamily selector should provide a valid font-family value"
+        );
+      });
+
+      tests.push(() => {
+        const beforeValue = $("fontFamily").value;
+        const beforeCustom = $("customFontName").value;
+        $("fontFamily").value = "custom";
+        $("customFontName").value = "테스트글꼴";
+        assertTrue(
+          getPracticeFontFamily().includes("테스트글꼴"),
+          "custom local font name should be included in practice font-family"
+        );
+        $("fontFamily").value = beforeValue;
+        $("customFontName").value = beforeCustom;
+      });
+
+      tests.push(() => {
+        assertTrue(clampNumber("30", 10, 20, 15) === 20, "clampNumber should cap max value");
+        assertTrue(clampNumber("5", 10, 20, 15) === 10, "clampNumber should cap min value");
+        assertTrue(clampNumber("abc", 10, 20, 15) === 15, "clampNumber should use fallback for invalid number");
+      });
+
+      let passed = 0;
+      const errors = [];
+
+      tests.forEach((test, index) => {
+        try {
+          test();
+          passed += 1;
+        } catch (error) {
+          errors.push(`테스트 ${index + 1} 실패: ${error.message}`);
+        }
+      });
+
+      const testStatus = $("testStatus");
+      if (errors.length === 0) {
+        testStatus.textContent = `자체 테스트 통과: ${passed}/${tests.length}`;
+        console.log(`글씨 연습장 생성기 자체 테스트 통과: ${passed}/${tests.length}`);
+      } else {
+        testStatus.textContent = errors.join("\n");
+        console.error(errors.join("\n"));
+      }
+    }
+
+    [
+      "titleInput",
+      "textInput",
+      "colCount",
+      "repeatCount",
+      "cellHeight",
+      "fontSize",
+      "guideRows",
+      "pageNo",
+      "fontFamily",
+      "customFontName",
+      "opacityMode"
+    ].forEach((id) => {
+      $(id).addEventListener("input", renderPractice);
+      $(id).addEventListener("change", renderPractice);
+    });
+
+    runSelfTests();
+    renderPractice();
+  </script>
+</body>
+</html>
