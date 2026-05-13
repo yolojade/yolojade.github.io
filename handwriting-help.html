@@ -1,0 +1,543 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>글씨 연습장 생성기 도움말</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: #f3f4f6;
+        color: #111827;
+        font-family: "Noto Sans KR", "Malgun Gothic", sans-serif;
+        line-height: 1.7;
+      }
+
+      .help-page {
+        max-width: 860px;
+        margin: 0 auto;
+        padding: 32px 18px 60px;
+      }
+
+      .help-card {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 20px 45px rgba(0, 0, 0, 0.08);
+      }
+
+      .help-header {
+        padding: 28px 30px;
+        background: #111827;
+        color: #ffffff;
+      }
+
+      .help-header h1 {
+        margin: 0 0 8px;
+        font-size: 28px;
+        line-height: 1.35;
+      }
+
+      .help-header p {
+        margin: 0;
+        color: #d1d5db;
+        font-size: 15px;
+      }
+
+      .help-content {
+        padding: 30px;
+      }
+
+      h2 {
+        margin: 34px 0 12px;
+        padding-top: 22px;
+        border-top: 1px solid #e5e7eb;
+        color: #0f172a;
+        font-size: 21px;
+      }
+
+      h2:first-child {
+        margin-top: 0;
+        padding-top: 0;
+        border-top: 0;
+      }
+
+      p {
+        margin: 8px 0 14px;
+      }
+
+      ol,
+      ul {
+        margin: 10px 0 18px 22px;
+        padding: 0;
+      }
+
+      li {
+        margin: 5px 0;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 12px 0 22px;
+        font-size: 14px;
+      }
+
+      th,
+      td {
+        border: 1px solid #d1d5db;
+        padding: 10px 12px;
+        text-align: left;
+        vertical-align: top;
+      }
+
+      th {
+        background: #f3f4f6;
+        font-weight: 800;
+      }
+
+      .example {
+        background: #f9fafb;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 14px 16px;
+        margin: 10px 0 18px;
+        white-space: pre-line;
+        font-family: "Malgun Gothic", sans-serif;
+        color: #111827;
+      }
+
+      .note {
+        background: #ecfdf5;
+        border: 1px solid #a7f3d0;
+        border-radius: 12px;
+        padding: 14px 16px;
+        color: #064e3b;
+        margin: 12px 0 18px;
+      }
+
+      .warning {
+        background: #fffbeb;
+        border: 1px solid #fde68a;
+        border-radius: 12px;
+        padding: 14px 16px;
+        color: #78350f;
+        margin: 12px 0 18px;
+      }
+
+      .quick-box {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin: 16px 0 24px;
+      }
+
+      .quick-item {
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        padding: 14px;
+        background: #f9fafb;
+      }
+
+      .quick-item strong {
+        display: block;
+        margin-bottom: 4px;
+        color: #0f172a;
+      }
+
+      .print-button {
+        display: inline-block;
+        margin-top: 12px;
+        border: 0;
+        border-radius: 10px;
+        padding: 11px 16px;
+        background: #1d4ed8;
+        color: #ffffff;
+        font-weight: 800;
+        cursor: pointer;
+        font-family: inherit;
+      }
+
+      @media (max-width: 720px) {
+        .help-page {
+          padding: 16px 10px 40px;
+        }
+
+        .help-header,
+        .help-content {
+          padding: 22px 18px;
+        }
+
+        .quick-box {
+          grid-template-columns: 1fr;
+        }
+
+        table {
+          font-size: 13px;
+        }
+      }
+
+      @media print {
+        body {
+          background: white;
+        }
+
+        .help-page {
+          max-width: none;
+          padding: 0;
+        }
+
+        .help-card {
+          box-shadow: none;
+          border: 0;
+          border-radius: 0;
+        }
+
+        .help-header {
+          background: white;
+          color: #111827;
+          border-bottom: 2px solid #111827;
+        }
+
+        .help-header p {
+          color: #374151;
+        }
+
+        .print-button {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="help-page">
+      <section class="help-card">
+        <header class="help-header">
+          <h1>글씨 연습장 생성기 사용 도움말</h1>
+          <p>
+            원하는 글자나 문장을 입력하면 A4 출력용 글씨 연습장을 자동으로
+            만들어주는 페이지입니다.
+          </p>
+          <button class="print-button" type="button" onclick="window.print()">
+            도움말 인쇄하기
+          </button>
+        </header>
+
+        <div class="help-content">
+          <h2>1. 이 페이지는 무엇인가요?</h2>
+          <p>
+            이 페이지는 사용자가 입력한 글자나 문장을 바탕으로
+            <strong>A4 용지에 출력할 수 있는 글씨 연습장</strong>을 만들어주는
+            도구입니다.
+          </p>
+          <p>
+            한글 따라쓰기, 문장 필사, 받아쓰기 준비, 영어 단어 쓰기 연습 등에
+            사용할 수 있습니다.
+          </p>
+
+          <div class="quick-box">
+            <div class="quick-item">
+              <strong>A4 출력</strong>
+              세로형 A4 용지에 맞춰 출력됩니다.
+            </div>
+            <div class="quick-item">
+              <strong>10칸 자동 정렬</strong>
+              기본값은 한 줄 10칸입니다.
+            </div>
+            <div class="quick-item">
+              <strong>5번 반복</strong>
+              기본값은 같은 내용을 5번 반복합니다.
+            </div>
+          </div>
+
+          <h2>2. 기본 사용 순서</h2>
+          <ol>
+            <li><strong>제목</strong> 칸에 연습장 제목을 입력합니다.</li>
+            <li>
+              <strong>연습 문장</strong> 칸에 따라 쓸 글자나 문장을 입력합니다.
+            </li>
+            <li>
+              필요하면 한 줄 칸 수, 반복 횟수, 글자 크기, 글씨체를 조절합니다.
+            </li>
+            <li>
+              <strong>미리보기 적용</strong> 버튼을 눌러 결과를 확인합니다.
+            </li>
+            <li><strong>A4 인쇄</strong> 버튼을 눌러 출력합니다.</li>
+          </ol>
+
+          <h2>3. 제목 입력하기</h2>
+          <p>제목 칸에는 출력물 상단에 표시될 이름을 입력합니다.</p>
+          <div class="example">
+            예시 펜글씨 연습 한글 따라쓰기 바른 글씨 연습 문장 쓰기 연습
+          </div>
+
+          <h2>4. 연습 문장 입력하기</h2>
+          <p>연습 문장 칸에 따라 쓸 글자나 문장을 입력합니다.</p>
+          <p>여러 문장을 입력하고 싶을 때는 줄을 바꿔서 입력하면 됩니다.</p>
+
+          <div class="example">
+            입력 예시 봄여름가을겨울 하늘땅 별바람 나는 바르게 글씨를 씁니다
+          </div>
+
+          <p>각 줄은 각각 다른 연습 문장으로 처리됩니다.</p>
+
+          <h2>5. 긴 문장은 어떻게 출력되나요?</h2>
+          <p>
+            기본값은 <strong>한 줄 10칸</strong>입니다. 긴 문장을 입력하면
+            10칸씩 나누어진 뒤, 각 묶음이 반복됩니다.
+          </p>
+
+          <div class="example">
+            입력 예시 가나다라마바사아자차카타파하 출력 방식 가 나 다 라 마 바
+            사 아 자 차 가 나 다 라 마 바 사 아 자 차 가 나 다 라 마 바 사 아 자
+            차 가 나 다 라 마 바 사 아 자 차 가 나 다 라 마 바 사 아 자 차 카 타
+            파 하 카 타 파 하 카 타 파 하 카 타 파 하 카 타 파 하
+          </div>
+
+          <div class="note">
+            긴 문장은 전체 문장을 5번 반복하는 방식이 아니라,
+            <strong>10칸 단위로 5번 반복한 뒤 다음 내용으로 넘어갑니다.</strong>
+          </div>
+
+          <h2>6. 설정 항목 설명</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>항목</th>
+                <th>설명</th>
+                <th>추천값</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>한 줄 칸 수</td>
+                <td>한 줄에 들어갈 칸 개수입니다.</td>
+                <td>10칸</td>
+              </tr>
+              <tr>
+                <td>문장별 반복 횟수</td>
+                <td>같은 내용을 몇 번 반복할지 정합니다.</td>
+                <td>5회</td>
+              </tr>
+              <tr>
+                <td>칸 높이</td>
+                <td>각 칸의 세로 크기입니다.</td>
+                <td>14mm</td>
+              </tr>
+              <tr>
+                <td>글자 크기</td>
+                <td>칸 안에 보이는 글자 크기입니다.</td>
+                <td>30px</td>
+              </tr>
+              <tr>
+                <td>진한 줄 수</td>
+                <td>처음 몇 줄을 진하게 보여줄지 정합니다.</td>
+                <td>1줄</td>
+              </tr>
+              <tr>
+                <td>페이지 번호</td>
+                <td>출력물 하단의 페이지 번호를 정합니다.</td>
+                <td>1</td>
+              </tr>
+              <tr>
+                <td>글씨체</td>
+                <td>출력되는 글자의 글씨체를 선택합니다.</td>
+                <td>바탕체</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h2>7. 추천 설정</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>대상</th>
+                <th>한 줄 칸 수</th>
+                <th>반복 횟수</th>
+                <th>칸 높이</th>
+                <th>글자 크기</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>초등 저학년</td>
+                <td>8~10칸</td>
+                <td>5회</td>
+                <td>16mm</td>
+                <td>34px</td>
+              </tr>
+              <tr>
+                <td>기본 글씨 연습</td>
+                <td>10칸</td>
+                <td>5회</td>
+                <td>14mm</td>
+                <td>30px</td>
+              </tr>
+              <tr>
+                <td>긴 문장 연습</td>
+                <td>10~12칸</td>
+                <td>3~5회</td>
+                <td>14mm</td>
+                <td>28~30px</td>
+              </tr>
+              <tr>
+                <td>영어 단어 연습</td>
+                <td>12~15칸</td>
+                <td>5회</td>
+                <td>14mm</td>
+                <td>30px</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h2>8. 글씨체 사용 안내</h2>
+          <p>
+            기본 글씨체를 선택하거나, 내 PC에 설치된 글씨체 이름을 직접 입력할
+            수 있습니다.
+          </p>
+          <ul>
+            <li><strong>바탕체</strong>: 기본 글씨 연습용</li>
+            <li><strong>궁서체</strong>: 또박또박한 글씨 느낌</li>
+            <li><strong>맑은 고딕</strong>: 깔끔한 글씨 연습</li>
+            <li><strong>명조 계열</strong>: 책 글씨 느낌</li>
+            <li><strong>영문 기본체</strong>: 영어 단어 연습용</li>
+            <li>
+              <strong>내 PC 글씨체 직접 입력</strong>: 설치된 글꼴 이름을 직접
+              입력
+            </li>
+          </ul>
+
+          <div class="warning">
+            내 PC 글씨체는 사용자의 컴퓨터에 설치되어 있어야 적용됩니다. 글꼴
+            이름이 정확하지 않으면 기본 글씨체로 보일 수 있습니다.
+          </div>
+
+          <h2>9. 따라쓰기 농도 안내</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>옵션</th>
+                <th>추천 상황</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>첫 줄 진하게, 아래로 갈수록 흐리게</td>
+                <td>처음 연습하는 학생에게 추천합니다.</td>
+              </tr>
+              <tr>
+                <td>전체 같은 흐림</td>
+                <td>모든 줄을 같은 농도로 따라 쓸 때 사용합니다.</td>
+              </tr>
+              <tr>
+                <td>첫 줄만 제시하고 나머지는 빈칸</td>
+                <td>익숙해진 뒤 스스로 써보는 연습에 좋습니다.</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h2>10. A4 인쇄 방법</h2>
+          <ol>
+            <li><strong>A4 인쇄</strong> 버튼을 누릅니다.</li>
+            <li>인쇄 창에서 용지 크기를 <strong>A4</strong>로 설정합니다.</li>
+            <li>방향은 <strong>세로</strong>로 설정합니다.</li>
+            <li>배율은 <strong>100%</strong>로 설정합니다.</li>
+            <li>
+              칸 선이 흐리게 보이면 <strong>배경 그래픽</strong> 옵션을 켭니다.
+            </li>
+          </ol>
+
+          <h2>11. 사용 예시</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>목적</th>
+                <th>입력 예시</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>계절 단어 연습</td>
+                <td>봄여름가을겨울</td>
+              </tr>
+              <tr>
+                <td>짧은 단어 연습</td>
+                <td>하늘<br />바다<br />구름<br />나무</td>
+              </tr>
+              <tr>
+                <td>문장 따라쓰기</td>
+                <td>나는 바른 자세로 글씨를 씁니다</td>
+              </tr>
+              <tr>
+                <td>영어 단어 연습</td>
+                <td>apple<br />banana<br />computer<br />keyboard</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h2>12. 자주 생기는 문제</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>문제</th>
+                <th>해결 방법</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>출력물이 잘려요.</td>
+                <td>
+                  인쇄 배율을 100%로 설정하고, 용지 크기가 A4인지 확인하세요.
+                </td>
+              </tr>
+              <tr>
+                <td>칸 선이 잘 안 보여요.</td>
+                <td>인쇄 설정에서 배경 그래픽 옵션을 켜보세요.</td>
+              </tr>
+              <tr>
+                <td>글씨체가 바뀌지 않아요.</td>
+                <td>해당 글씨체가 컴퓨터에 설치되어 있는지 확인하세요.</td>
+              </tr>
+              <tr>
+                <td>글자가 너무 커요.</td>
+                <td>글자 크기를 줄이거나 칸 높이를 키워보세요.</td>
+              </tr>
+              <tr>
+                <td>A4 한 장을 넘어가요.</td>
+                <td>문장 수를 줄이거나 반복 횟수를 줄여주세요.</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h2>13. 추천 사용 방법</h2>
+          <ul>
+            <li>
+              처음 연습할 때는
+              <strong>첫 줄 진하게, 아래로 갈수록 흐리게</strong> 옵션을
+              추천합니다.
+            </li>
+            <li>
+              익숙해진 뒤에는
+              <strong>첫 줄만 제시하고 나머지는 빈칸</strong> 옵션으로 연습하면
+              좋습니다.
+            </li>
+            <li>짧은 단어는 한 줄 10칸을 추천합니다.</li>
+            <li>
+              긴 문장은 자동으로 10칸씩 나누어지므로 그대로 입력해도 됩니다.
+            </li>
+          </ul>
+
+          <div class="note">
+            완성된 연습지는 A4 용지로 출력하여 글씨 연습, 받아쓰기 준비, 문장
+            필사 연습 등에 사용할 수 있습니다.
+          </div>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

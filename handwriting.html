@@ -40,6 +40,25 @@
       line-height: 1.3;
     }
 
+    .help-top {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 12px;
+    }
+
+    .help-button {
+      padding: 8px 12px;
+      border: 1px solid #c7d2fe;
+      border-radius: 8px;
+      background: #eef2ff;
+      color: #1e3a8a;
+      font-size: 13px;
+    }
+
+    .help-button:hover {
+      background: #e0e7ff;
+    }
+
     .panel p {
       margin: 0 0 20px;
       color: #6b7280;
@@ -278,6 +297,9 @@
 <body>
   <div class="app">
     <aside class="panel screen-only">
+      <div class="help-top">
+        <button class="help-button" type="button" onclick="openHelpPopup()">도움말</button>
+      </div>
       <h1>글씨 연습장 생성기</h1>
       <p>여러 문장을 줄바꿈으로 입력하면 문장별로 반복되고, 긴 문장은 10칸씩 나눈 뒤 각 줄을 반복합니다.</p>
 
@@ -377,6 +399,14 @@
 
   <script>
     const $ = (id) => document.getElementById(id);
+
+    function openHelpPopup() {
+      window.open(
+        "./handwriting-help.html",
+        "handwritingHelp",
+        "width=900,height=700,menubar=no,toolbar=no,location=no,status=no,scrollbars=yes,resizable=yes"
+      );
+    }
 
     function splitChars(text) {
       return Array.from(String(text).replace(/\n/g, " ")).filter((ch) => ch !== "");
