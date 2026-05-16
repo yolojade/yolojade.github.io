@@ -1,81 +1,81 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>🔮 포춘쿠키 운세</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
     <div class="stars-background" id="starsBackground"></div>
-    
+
     <div class="container">
-        <!-- 헤더 -->
-        <header class="header">
-            <h1 class="title">🔮 포춘쿠키 운세</h1>
-            <p class="subtitle">카테고리를 선택하고 쿠키를 클릭하세요!</p>
-        </header>
+      <!-- 헤더 -->
+      <header class="header">
+        <h1 class="title">🔮 포춘쿠키 운세</h1>
+        <p class="subtitle">카테고리를 선택하고 쿠키를 클릭하세요!</p>
+      </header>
 
-        <!-- 카테고리 선택 -->
-        <div class="categories">
-            <button class="category-btn active" data-category="종합운">
-                <span class="category-icon">★</span>
-                <span class="category-name">종합운</span>
-            </button>
-            <button class="category-btn" data-category="애정운">
-                <span class="category-icon">♥</span>
-                <span class="category-name">애정운</span>
-            </button>
-            <button class="category-btn" data-category="금전운">
-                <span class="category-icon">$</span>
-                <span class="category-name">금전운</span>
-            </button>
-            <button class="category-btn" data-category="건강운">
-                <span class="category-icon">♣</span>
-                <span class="category-name">건강운</span>
-            </button>
-            <button class="category-btn" data-category="학업·직장운">
-                <span class="category-icon">◆</span>
-                <span class="category-name">학업·직장운</span>
-            </button>
+      <!-- 카테고리 선택 -->
+      <div class="categories">
+        <button class="category-btn active" data-category="종합운">
+          <span class="category-icon">★111</span>
+          <span class="category-name">종합운</span>
+        </button>
+        <button class="category-btn" data-category="애정운">
+          <span class="category-icon">♥</span>
+          <span class="category-name">애정운</span>
+        </button>
+        <button class="category-btn" data-category="금전운">
+          <span class="category-icon">$</span>
+          <span class="category-name">금전운</span>
+        </button>
+        <button class="category-btn" data-category="건강운">
+          <span class="category-icon">♣</span>
+          <span class="category-name">건강운</span>
+        </button>
+        <button class="category-btn" data-category="학업·직장운">
+          <span class="category-icon">◆</span>
+          <span class="category-name">학업·직장운</span>
+        </button>
+      </div>
+
+      <!-- 이름 입력 -->
+      <div class="name-form">
+        <label class="name-label" for="userName">이름을 입력하세요</label>
+        <input
+          class="name-input"
+          type="text"
+          id="userName"
+          name="userName"
+          placeholder="예: 홍길동"
+          maxlength="12"
+          autocomplete="name"
+        />
+      </div>
+
+      <!-- 포춘쿠키 -->
+      <div class="fortune-cookie-container">
+        <div class="fortune-cookie" id="fortuneCookie">
+          <div class="fortune-paper"></div>
+          <div class="cookie-top"></div>
+          <div class="cookie-bottom"></div>
         </div>
+        <p class="cookie-hint" id="cookieHint">클릭하여 운세 뽑기!</p>
+      </div>
 
-        <!-- 이름 입력 -->
-        <div class="name-form">
-            <label class="name-label" for="userName">이름을 입력하세요</label>
-            <input
-                class="name-input"
-                type="text"
-                id="userName"
-                name="userName"
-                placeholder="예: 홍길동"
-                maxlength="12"
-                autocomplete="name"
-            >
+      <!-- 운세 표시 영역 -->
+      <div class="fortune-display" id="fortuneDisplay">
+        <div class="fortune-card" id="fortuneCard">
+          <div class="fortune-category" id="fortuneCategory"></div>
+          <div class="fortune-text" id="fortuneText"></div>
         </div>
+      </div>
 
-        <!-- 포춘쿠키 -->
-        <div class="fortune-cookie-container">
-            <div class="fortune-cookie" id="fortuneCookie">
-                <div class="fortune-paper"></div>
-                <div class="cookie-top"></div>
-                <div class="cookie-bottom"></div>
-            </div>
-            <p class="cookie-hint" id="cookieHint">클릭하여 운세 뽑기!</p>
-        </div>
-
-        <!-- 운세 표시 영역 -->
-        <div class="fortune-display" id="fortuneDisplay">
-            <div class="fortune-card" id="fortuneCard">
-                <div class="fortune-category" id="fortuneCategory"></div>
-                <div class="fortune-text" id="fortuneText"></div>
-            </div>
-        </div>
-
-        <!-- 파티클 컨테이너 -->
-        <div class="particles-container" id="particlesContainer"></div>
+      <!-- 파티클 컨테이너 -->
+      <div class="particles-container" id="particlesContainer"></div>
     </div>
 
     <script src="script.js"></script>
-</body>
+  </body>
 </html>
