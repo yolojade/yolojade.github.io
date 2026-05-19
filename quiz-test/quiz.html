@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>파이썬 퀴즈 - 통합 테스트</title>
+    <link rel="stylesheet" href="./shared/styles.css" />
+  </head>
+  <body>
+    <main class="quiz-wrapper">
+      <a class="back-link" href="./index.html">문제 목록</a>
+      <h1 id="quiz-title">파이썬 퀴즈</h1>
+
+      <div id="start-section" class="start-section">
+        <div class="student-form">
+          <label for="student-id">학번</label>
+          <input type="text" id="student-id" placeholder="학번을 입력하세요" />
+
+          <label for="student-name">이름</label>
+          <input
+            type="text"
+            id="student-name"
+            placeholder="이름을 입력하세요"
+          />
+
+          <button onclick="startQuiz()">시작하기</button>
+        </div>
+      </div>
+
+      <div id="quiz-section" style="display: none">
+        <div id="quiz-container"></div>
+
+        <div class="button-group">
+          <button onclick="submitQuiz()">제출하기</button>
+          <button onclick="showAnswers()">정답보기</button>
+          <button onclick="resetQuiz()">다시 풀기</button>
+        </div>
+
+        <div id="result"></div>
+      </div>
+    </main>
+
+    <script src="./shared/quiz-data.js"></script>
+    <script src="./shared/quiz.js"></script>
+  </body>
+</html>
