@@ -151,11 +151,9 @@ a = k[2] + "랑"
 b = "순살" + k[1]
 c = a + " " + b
 print(c)
-
 result1 = c[6]
 result2 = c[3]
 print(result1 + result2)
-
 d = k[0]
 result3 = d[0] + c[8]
 print(result3)
@@ -166,16 +164,13 @@ print(result3)
 
 20
 t = ["소프트웨어", "정보", "999"]
-
 a = t[0] * 3
 b = a[4:7]
 print(b)
-
 c = t[2]
 c = int(c)
 d = c - 222
 print(t[1], d)
-
 n = d - 800
 n = n + 25
 last = t[1] * n

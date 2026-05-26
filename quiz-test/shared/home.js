@@ -2,7 +2,7 @@ const quizList = document.getElementById("quiz-list");
 
 quizList.innerHTML = QUIZZES.map(
   (quiz) => `
-    <a class="card" href="./quiz-test/quiz.html?id=${encodeURIComponent(quiz.id)}">
+    <a class="card" href="quiz-test/quiz.html?id=${encodeURIComponent(quiz.id)}">
       <h2>${escapeHtml(quiz.title)}</h2>
       <p>${escapeHtml(quiz.description)}</p>
     </a>
