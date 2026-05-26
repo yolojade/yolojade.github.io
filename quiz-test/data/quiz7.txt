@@ -1,0 +1,186 @@
+1
+a = 10
+a = a + 10
+a = a + 20
+print(a)
+===
+40
+
+2
+a = 1000
+a = a - 10
+print(a - 100)
+===
+890
+
+3
+a = 100
+a = a - a
+print(a)
+===
+0
+
+4
+num1 = 0
+num1 = 5
+num2 = 10
+print(num1 + num2)
+===
+15
+
+5
+a = "초코"
+b = "파이"
+print(a + b, end="굿")
+===
+초코파이굿
+
+6
+a = "코카"
+b = "콜라"
+print(a, b, sep="-")
+===
+코카-콜라
+
+7
+a = "한글"
+b = "사전"
+c = a + " " + b
+print(c)
+===
+한글 사전
+
+8
+a = 1
+print(a)
+a = a + 10
+print(a + 2)
+===
+1
+13
+
+9
+a = 15
+a = a + a
+print(a + a, end=" ")
+print(a)
+===
+60 30
+
+10
+list1 = [5,17,61,-1,0]
+list2 = [4,9,-10,8,-7]
+print(list1[0:2])
+print(list2[4])
+===
+[5, 17]
+-7
+
+11
+m = "마우스키보드"
+m = "키보드마우스"
+print(m[2:4])
+===
+드마
+
+12
+s = "마우스"
+d = "키보드"
+f = "프린터"
+print(s[0] + d[2] + f[1])
+===
+마드린
+
+13
+k = 10
+k += 1
+print(k)
+k -= 2
+print(k)
+===
+11
+9
+
+14
+n = 100
+n *= 2
+n //= 10
+n **= 2
+print(n)
+===
+400
+
+15
+t = 20
+t //= 5
+t //= 2
+print(t)
+===
+2
+
+16
+list_a = [1,4,9,16,25,36]
+a = list_a[1]
+print(a)
+a *= list_a[2]
+print(a)
+===
+4
+36
+
+17
+n1 = input()   # 50 입력
+n1 = int(n1)
+n2 = 2
+n2 *= n1
+print(n2 - 20)
+===
+80
+
+18
+b = 6.81
+b = int(b)
+b **= 2
+print(b)
+===
+36
+
+19
+k = ["피자", "치킨", "햄버거"]
+a = k[2] + "랑"
+b = "순살" + k[1]
+c = a + " " + b
+print(c)
+
+result1 = c[6]
+result2 = c[3]
+print(result1 + result2)
+
+d = k[0]
+result3 = d[0] + c[8]
+print(result3)
+===
+햄버거랑 순살치킨
+살랑
+피킨
+
+20
+t = ["소프트웨어", "정보", "999"]
+
+a = t[0] * 3
+b = a[4:7]
+print(b)
+
+c = t[2]
+c = int(c)
+d = c - 222
+print(t[1], d)
+
+n = d - 800
+n = n + 25
+last = t[1] * n
+print(last)
+===
+어소프
+정보 777
+정보정보
