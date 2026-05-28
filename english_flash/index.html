@@ -1,0 +1,736 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>초등 영어 동사 양면 플래시카드</title>
+    <style>
+      :root {
+        --navy: #10233f;
+        --green: #22a06b;
+        --orange: #ff9f1c;
+        --light: #f6f8fb;
+        --card: #ffffff;
+        --border: #d9e2ec;
+        --text: #1f2937;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Pretendard", "Noto Sans KR", Arial, sans-serif;
+        font-size: 18px;
+        background: var(--light);
+        color: var(--text);
+      }
+
+      header {
+        background: linear-gradient(135deg, var(--navy), #163b67);
+        color: white;
+        padding: 32px 20px;
+        text-align: center;
+      }
+
+      header h1 {
+        margin: 0 0 10px;
+        font-size: 40px;
+        letter-spacing: -0.5px;
+      }
+
+      header p {
+        margin: 0;
+        font-size: 19px;
+        opacity: 0.9;
+      }
+
+      .toolbar {
+        max-width: 1100px;
+        margin: 24px auto 10px;
+        padding: 0 20px;
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+
+      button,
+      .file-label {
+        border: none;
+        border-radius: 999px;
+        padding: 14px 20px;
+        font-size: 18px;
+        font-weight: 700;
+        cursor: pointer;
+        transition:
+          transform 0.15s ease,
+          box-shadow 0.15s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+      }
+
+      button:hover,
+      .file-label:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 18px rgba(16, 35, 63, 0.18);
+      }
+
+      .primary {
+        background: var(--orange);
+        color: #222;
+      }
+      .secondary {
+        background: var(--green);
+        color: white;
+      }
+      .outline {
+        background: white;
+        color: var(--navy);
+        border: 1px solid var(--border);
+      }
+      input[type="file"] {
+        display: none;
+      }
+
+      .guide {
+        max-width: 960px;
+        margin: 16px auto 24px;
+        padding: 0 20px;
+        text-align: center;
+        font-size: 18px;
+        line-height: 1.7;
+        color: #52606d;
+      }
+
+      .status {
+        max-width: 960px;
+        margin: 0 auto 12px;
+        padding: 0 20px;
+        text-align: center;
+        color: #52606d;
+        font-size: 17px;
+      }
+
+      .data-box {
+        max-width: 960px;
+        margin: 0 auto 28px;
+        padding: 0 20px;
+      }
+
+      .data-box details {
+        background: white;
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        padding: 18px 20px;
+        box-shadow: 0 8px 20px rgba(16, 35, 63, 0.06);
+      }
+
+      .data-box summary {
+        font-weight: 900;
+        color: var(--navy);
+        cursor: pointer;
+      }
+
+      pre {
+        background: #0f172a;
+        color: #e5e7eb;
+        padding: 16px;
+        border-radius: 14px;
+        overflow-x: auto;
+        line-height: 1.5;
+        font-size: 16px;
+      }
+
+      .view-title {
+        max-width: 1100px;
+        margin: 24px auto 12px;
+        padding: 0 20px;
+        font-size: 28px;
+        color: var(--navy);
+      }
+
+      .study-section {
+        max-width: 760px;
+        margin: 28px auto 36px;
+        padding: 0 20px;
+      }
+
+      .study-card {
+        min-height: 330px;
+        border: 2px solid var(--border);
+        border-top: 10px solid var(--orange);
+        border-radius: 22px;
+        background: white;
+        box-shadow: 0 14px 34px rgba(16, 35, 63, 0.12);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+        padding: 34px 28px;
+        text-align: center;
+        cursor: pointer;
+        user-select: none;
+      }
+
+      .study-card.is-back {
+        border-top-color: var(--green);
+        background: #edfdf5;
+      }
+
+      .study-meta {
+        color: #52606d;
+        font-size: 18px;
+        font-weight: 800;
+      }
+
+      .study-main {
+        color: var(--navy);
+        font-size: 58px;
+        font-weight: 900;
+        word-break: keep-all;
+      }
+
+      .study-card.is-back .study-main {
+        color: var(--green);
+      }
+
+      .study-sub {
+        color: #52606d;
+        font-size: 22px;
+        line-height: 1.45;
+      }
+
+      .study-actions {
+        margin-top: 16px;
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .cards {
+        max-width: 1100px;
+        margin: 0 auto 42px;
+        padding: 0 20px;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 18px;
+      }
+
+      .card {
+        min-height: 210px;
+        background: #fff7e8;
+        border: 2px solid var(--border);
+        border-radius: 22px;
+        box-shadow: 0 10px 24px rgba(16, 35, 63, 0.08);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 18px;
+        text-align: center;
+        position: relative;
+      }
+
+      .front-card {
+        border-top: 8px solid var(--orange);
+      }
+      .back-card {
+        border-top: 8px solid var(--green);
+        background: #edfdf5;
+      }
+
+      .number {
+        position: absolute;
+        top: 12px;
+        left: 14px;
+        background: var(--navy);
+        color: white;
+        font-size: 15px;
+        font-weight: 800;
+        padding: 5px 9px;
+        border-radius: 999px;
+      }
+
+      .word {
+        font-size: 44px;
+        font-weight: 900;
+        color: var(--navy);
+        margin-bottom: 10px;
+      }
+
+      .meaning {
+        font-size: 38px;
+        font-weight: 900;
+        color: var(--green);
+        margin-bottom: 10px;
+        word-break: keep-all;
+      }
+
+      .example {
+        font-size: 19px;
+        line-height: 1.45;
+        color: #52606d;
+      }
+
+      .print-page-title {
+        display: none;
+      }
+
+      @media (max-width: 640px) {
+        .study-card {
+          min-height: 280px;
+          padding: 28px 20px;
+        }
+
+        .study-main {
+          font-size: 44px;
+        }
+
+        .study-sub {
+          font-size: 19px;
+        }
+      }
+
+      @page {
+        size: A4 portrait;
+        margin: 10mm;
+      }
+
+      @media print {
+        * {
+          -webkit-print-color-adjust: exact !important;
+          print-color-adjust: exact !important;
+        }
+
+        body {
+          background: white;
+        }
+
+        header,
+        .toolbar,
+        .guide,
+        .data-box,
+        .status,
+        .study-section,
+        .view-title,
+        #previewFront,
+        #previewBack {
+          display: none !important;
+        }
+
+        .print-page-title {
+          display: block;
+          text-align: center;
+          margin: 0 0 8mm;
+          font-size: 19px;
+          font-weight: 900;
+          color: #111;
+        }
+
+        .print-sheet {
+          display: grid !important;
+          grid-template-columns: repeat(4, 1fr);
+          grid-auto-rows: 45mm;
+          gap: 4mm;
+          page-break-after: always;
+          break-after: page;
+        }
+
+        .print-sheet:last-child {
+          page-break-after: auto;
+          break-after: auto;
+        }
+
+        .print-card {
+          height: 45mm;
+          border: 1.3px solid #111;
+          border-top: 3mm solid #ff9f1c;
+          border-radius: 5mm;
+          box-shadow: none;
+          background: #fff7e8;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          text-align: center;
+          padding: 4mm;
+          position: relative;
+          break-inside: avoid;
+          page-break-inside: avoid;
+          overflow: hidden;
+        }
+
+        .print-card.back-print {
+          border-top: 3mm solid #22a06b;
+          background: #edfdf5;
+        }
+
+        .print-card .number {
+          top: 3mm;
+          left: 3mm;
+          background: #10233f;
+          color: white;
+          border: 1px solid #10233f;
+          font-size: 11px;
+          padding: 1mm 2mm;
+        }
+
+        .print-card .word {
+          font-size: 31px;
+          margin-bottom: 2mm;
+          color: #10233f;
+        }
+
+        .print-card .meaning {
+          font-size: 26px;
+          margin-bottom: 2mm;
+          color: #0f5132;
+        }
+
+        .print-card .example {
+          font-size: 11px;
+          color: #333;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>초등 영어 동사 양면 플래시카드</h1>
+      <p>data.txt를 같은 폴더에 넣으면 영어 단어가 자동 적용됩니다.</p>
+    </header>
+
+    <div class="toolbar">
+      <button class="primary" onclick="window.print()">양면 인쇄하기</button>
+      <button class="secondary" onclick="shuffleCards()">카드 섞기</button>
+      <button class="outline" onclick="resetCards()">
+        기본 20개로 되돌리기
+      </button>
+      <label class="file-label outline" for="fileInput"
+        >data.txt 직접 불러오기</label
+      >
+      <input id="fileInput" type="file" accept=".txt" />
+    </div>
+
+    <p class="guide">
+      <strong>인쇄 방법:</strong> 양면 인쇄하기 → 프린터 설정에서
+      <strong>배경 그래픽</strong> 체크 →
+      <strong>양면 인쇄 / 긴 쪽으로 넘기기</strong>를 선택하세요.<br />
+      1쪽은 영어 앞면, 2쪽은 뜻 뒷면으로 출력됩니다. 프린터마다 여백이 다르므로
+      처음에는 1세트만 테스트 출력하세요.
+    </p>
+
+    <div class="status" id="status">기본 단어 20개를 불러왔습니다.</div>
+
+    <section class="study-section">
+      <h2 class="view-title">플래시 카드 학습</h2>
+      <div class="study-card" id="studyCard" onclick="flipStudyCard()"></div>
+      <div class="study-actions">
+        <button class="outline" onclick="prevStudyCard()">이전</button>
+        <button class="secondary" onclick="flipStudyCard()">뒤집기</button>
+        <button class="outline" onclick="nextStudyCard()">다음</button>
+      </div>
+    </section>
+
+    <section class="data-box">
+      <details>
+        <summary>data.txt 작성 방법 보기</summary>
+        <p>
+          HTML 파일과 같은 폴더에 <strong>data.txt</strong> 파일을 만들고 아래
+          형식으로 입력하세요.
+        </p>
+        <pre>
+go|가다|I go to school.
+come|오다|Come here.
+eat|먹다|I eat lunch.</pre
+        >
+        <p>
+          한 줄에 한 단어씩 입력합니다. 형식은
+          <strong>영어|뜻|예문</strong> 입니다.
+        </p>
+        <p>
+          크롬에서 파일을 더블클릭으로 열면 보안 설정 때문에 data.txt 자동
+          읽기가 막힐 수 있습니다. 그럴 때는
+          <strong>data.txt 직접 불러오기</strong> 버튼을 사용하거나 VS Code Live
+          Server로 실행하세요.
+        </p>
+      </details>
+    </section>
+
+    <h2 class="view-title">앞면 미리보기: 영어</h2>
+    <main class="cards" id="previewFront"></main>
+
+    <h2 class="view-title">뒷면 미리보기: 뜻</h2>
+    <main class="cards" id="previewBack"></main>
+
+    <section id="printArea"></section>
+
+    <script>
+      const defaultWords = [
+        { word: "go", meaning: "가다", example: "I go to school." },
+        { word: "come", meaning: "오다", example: "Come here." },
+        { word: "eat", meaning: "먹다", example: "I eat lunch." },
+        { word: "drink", meaning: "마시다", example: "I drink milk." },
+        { word: "play", meaning: "놀다 / 경기하다", example: "I play soccer." },
+        { word: "read", meaning: "읽다", example: "I read a book." },
+        { word: "write", meaning: "쓰다", example: "I write my name." },
+        { word: "see", meaning: "보다", example: "I see a dog." },
+        { word: "look", meaning: "보다", example: "Look at me." },
+        { word: "listen", meaning: "듣다", example: "Listen carefully." },
+        { word: "speak", meaning: "말하다", example: "I speak English." },
+        { word: "like", meaning: "좋아하다", example: "I like apples." },
+        { word: "want", meaning: "원하다", example: "I want water." },
+        { word: "have", meaning: "가지다", example: "I have a pencil." },
+        { word: "make", meaning: "만들다", example: "I make a card." },
+        { word: "do", meaning: "하다", example: "I do homework." },
+        { word: "help", meaning: "돕다", example: "Help me, please." },
+        { word: "open", meaning: "열다", example: "Open the door." },
+        { word: "close", meaning: "닫다", example: "Close the window." },
+        { word: "sit", meaning: "앉다", example: "Sit down." },
+      ];
+
+      let words = [...defaultWords];
+      let studyIndex = 0;
+      let studyFlipped = false;
+
+      const studyCard = document.getElementById("studyCard");
+      const previewFront = document.getElementById("previewFront");
+      const previewBack = document.getElementById("previewBack");
+      const printArea = document.getElementById("printArea");
+      const statusEl = document.getElementById("status");
+      const fileInput = document.getElementById("fileInput");
+
+      function parseDataText(text) {
+        return text
+          .split(/\r?\n/)
+          .map((line) => line.trim())
+          .filter((line) => line && !line.startsWith("#"))
+          .map((line) => {
+            const parts = line.split("|").map((part) => part.trim());
+            return {
+              word: parts[0] || "",
+              meaning: parts[1] || "",
+              example: parts[2] || "",
+            };
+          })
+          .filter((item) => item.word && item.meaning);
+      }
+
+      async function loadDataTxt() {
+        try {
+          const response = await fetch("data.txt", { cache: "no-store" });
+          if (!response.ok) throw new Error("data.txt 없음");
+          const text = await response.text();
+          const parsed = parseDataText(text);
+          if (parsed.length === 0) throw new Error("data.txt 형식 오류");
+          words = parsed;
+          studyIndex = 0;
+          studyFlipped = false;
+          renderAll();
+          statusEl.textContent = `data.txt에서 단어 ${words.length}개를 불러왔습니다.`;
+        } catch (error) {
+          renderAll();
+          statusEl.textContent =
+            "기본 단어 20개를 불러왔습니다. data.txt 자동 불러오기가 안 되면 직접 불러오기 버튼을 사용하세요.";
+        }
+      }
+
+      fileInput.addEventListener("change", (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const parsed = parseDataText(e.target.result);
+          if (parsed.length === 0) {
+            alert("data.txt 형식을 확인해 주세요. 예: go|가다|I go to school.");
+            return;
+          }
+          words = parsed;
+          studyIndex = 0;
+          studyFlipped = false;
+          renderAll();
+          statusEl.textContent = `직접 선택한 data.txt에서 단어 ${words.length}개를 불러왔습니다.`;
+        };
+        reader.readAsText(file, "UTF-8");
+      });
+
+      function renderStudyCard() {
+        if (words.length === 0) {
+          studyCard.className = "study-card";
+          studyCard.innerHTML = `<div class="study-main">단어 없음</div>`;
+          return;
+        }
+
+        if (studyIndex >= words.length) studyIndex = words.length - 1;
+        if (studyIndex < 0) studyIndex = 0;
+
+        const item = words[studyIndex];
+        studyCard.className = studyFlipped
+          ? "study-card is-back"
+          : "study-card";
+
+        if (studyFlipped) {
+          studyCard.innerHTML = `
+            <div class="study-meta">${studyIndex + 1} / ${words.length}</div>
+            <div class="study-main">${escapeHtml(item.meaning)}</div>
+            <div class="study-sub"><strong>${escapeHtml(item.word)}</strong><br>${escapeHtml(item.example || "")}</div>
+          `;
+        } else {
+          studyCard.innerHTML = `
+            <div class="study-meta">${studyIndex + 1} / ${words.length}</div>
+            <div class="study-main">${escapeHtml(item.word)}</div>
+            <div class="study-sub">${escapeHtml(item.example || "카드를 눌러 뜻 보기")}</div>
+          `;
+        }
+      }
+
+      function flipStudyCard() {
+        studyFlipped = !studyFlipped;
+        renderStudyCard();
+      }
+
+      function prevStudyCard() {
+        if (words.length === 0) return;
+        studyIndex = (studyIndex - 1 + words.length) % words.length;
+        studyFlipped = false;
+        renderStudyCard();
+      }
+
+      function nextStudyCard() {
+        if (words.length === 0) return;
+        studyIndex = (studyIndex + 1) % words.length;
+        studyFlipped = false;
+        renderStudyCard();
+      }
+
+      function renderPreview() {
+        previewFront.innerHTML = "";
+        previewBack.innerHTML = "";
+        words.forEach((item, index) => {
+          previewFront.appendChild(createScreenCard(item, index, "front"));
+          previewBack.appendChild(createScreenCard(item, index, "back"));
+        });
+      }
+
+      function createScreenCard(item, index, type) {
+        const card = document.createElement("section");
+        card.className =
+          type === "front" ? "card front-card" : "card back-card";
+        if (type === "front") {
+          card.innerHTML = `
+          <span class="number">${index + 1}</span>
+          <div class="word">${escapeHtml(item.word)}</div>
+          <div class="example">${escapeHtml(item.example || "")}</div>
+        `;
+        } else {
+          card.innerHTML = `
+          <span class="number">${index + 1}</span>
+          <div class="meaning">${escapeHtml(item.meaning)}</div>
+          <div class="example"><strong>${escapeHtml(item.word)}</strong><br>${escapeHtml(item.example || "")}</div>
+        `;
+        }
+        return card;
+      }
+
+      function renderPrintPages() {
+        printArea.innerHTML = "";
+        const chunkSize = 20;
+        const chunks = [];
+        for (let i = 0; i < words.length; i += chunkSize)
+          chunks.push(words.slice(i, i + chunkSize));
+
+        chunks.forEach((chunk, chunkIndex) => {
+          const frontTitle = document.createElement("h2");
+          frontTitle.className = "print-page-title";
+          frontTitle.textContent = `앞면 ${chunkIndex + 1}: 영어`;
+
+          const frontSheet = document.createElement("section");
+          frontSheet.className = "print-sheet";
+          frontSheet.style.display = "none";
+          chunk.forEach((item, index) =>
+            frontSheet.appendChild(
+              createPrintCard(item, chunkIndex * chunkSize + index, "front"),
+            ),
+          );
+
+          const backTitle = document.createElement("h2");
+          backTitle.className = "print-page-title";
+          backTitle.textContent = `뒷면 ${chunkIndex + 1}: 뜻`;
+
+          const backSheet = document.createElement("section");
+          backSheet.className = "print-sheet";
+          backSheet.style.display = "none";
+          chunk.forEach((item, index) =>
+            backSheet.appendChild(
+              createPrintCard(item, chunkIndex * chunkSize + index, "back"),
+            ),
+          );
+
+          printArea.appendChild(frontTitle);
+          printArea.appendChild(frontSheet);
+          printArea.appendChild(backTitle);
+          printArea.appendChild(backSheet);
+        });
+      }
+
+      function createPrintCard(item, index, type) {
+        const card = document.createElement("div");
+        card.className =
+          type === "back" ? "print-card back-print" : "print-card";
+        if (type === "front") {
+          card.innerHTML = `
+          <span class="number">${index + 1}</span>
+          <div class="word">${escapeHtml(item.word)}</div>
+          <div class="example">${escapeHtml(item.example || "")}</div>
+        `;
+        } else {
+          card.innerHTML = `
+          <span class="number">${index + 1}</span>
+          <div class="meaning">${escapeHtml(item.meaning)}</div>
+          <div class="example"><strong>${escapeHtml(item.word)}</strong><br>${escapeHtml(item.example || "")}</div>
+        `;
+        }
+        return card;
+      }
+
+      function renderAll() {
+        renderStudyCard();
+        renderPreview();
+        renderPrintPages();
+      }
+
+      function shuffleCards() {
+        words = [...words].sort(() => Math.random() - 0.5);
+        studyIndex = 0;
+        studyFlipped = false;
+        renderAll();
+        statusEl.textContent = `카드 순서를 섞었습니다. 현재 단어 ${words.length}개입니다.`;
+      }
+
+      function resetCards() {
+        words = [...defaultWords];
+        studyIndex = 0;
+        studyFlipped = false;
+        renderAll();
+        statusEl.textContent = "기본 단어 20개로 되돌렸습니다.";
+      }
+
+      function escapeHtml(value) {
+        return String(value)
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#039;");
+      }
+
+      loadDataTxt();
+    </script>
+  </body>
+</html>

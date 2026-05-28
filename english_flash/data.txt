@@ -1,0 +1,200 @@
+go|가다|I go to school.
+come|오다|Come here.
+eat|먹다|I eat lunch.
+drink|마시다|I drink water.
+play|놀다 / 경기하다|I play soccer.
+read|읽다|I read a book.
+write|쓰다|I write my name.
+see|보다|I see a cat.
+look|보다|Look at me.
+listen|듣다|Listen carefully.
+speak|말하다|I speak English.
+talk|이야기하다|I talk with my friend.
+say|말하다|Say hello.
+tell|말해주다|Tell me the story.
+ask|묻다|Ask a question.
+answer|대답하다|Answer the question.
+like|좋아하다|I like apples.
+love|사랑하다|I love my family.
+want|원하다|I want juice.
+need|필요하다|I need help.
+have|가지다|I have a pencil.
+make|만들다|I make a card.
+do|하다|I do homework.
+help|돕다|Help me, please.
+open|열다|Open the door.
+close|닫다|Close the window.
+sit|앉다|Sit down.
+stand|서다|Stand up.
+walk|걷다|I walk to school.
+run|달리다|I run fast.
+jump|뛰다|Jump high.
+swim|수영하다|I can swim.
+ride|타다|I ride a bike.
+fly|날다|Birds fly.
+drive|운전하다|My dad drives a car.
+stop|멈추다|Stop here.
+start|시작하다|Start now.
+finish|끝내다|Finish your work.
+wait|기다리다|Wait a minute.
+move|움직이다|Move slowly.
+turn|돌다 / 돌리다|Turn left.
+push|밀다|Push the door.
+pull|당기다|Pull the rope.
+give|주다|Give me a pen.
+take|가져가다 / 잡다|Take this book.
+bring|가져오다|Bring your bag.
+put|놓다|Put it here.
+pick|고르다 / 줍다|Pick one card.
+choose|고르다|Choose your answer.
+find|찾다|Find your pencil.
+use|사용하다|I use a computer.
+try|시도하다|Try again.
+learn|배우다|I learn English.
+study|공부하다|I study math.
+teach|가르치다|I teach coding.
+know|알다|I know the answer.
+think|생각하다|I think so.
+remember|기억하다|Remember this word.
+forget|잊다|Don't forget it.
+understand|이해하다|I understand you.
+wash|씻다|Wash your hands.
+clean|청소하다|Clean your room.
+cook|요리하다|I cook eggs.
+cut|자르다|Cut the paper.
+draw|그리다|Draw a dog.
+color|색칠하다|Color the picture.
+paint|칠하다 / 그리다|I paint a flower.
+sing|노래하다|I sing a song.
+dance|춤추다|I dance well.
+laugh|웃다|I laugh a lot.
+cry|울다|The baby cries.
+smile|미소 짓다|Smile, please.
+sleep|자다|I sleep at night.
+wake|깨다|Wake up early.
+work|일하다|My mom works.
+call|부르다 / 전화하다|Call me later.
+meet|만나다|I meet my friend.
+visit|방문하다|I visit my grandma.
+live|살다|I live in Korea.
+stay|머무르다|Stay here.
+leave|떠나다 / 남기다|I leave home at eight.
+wear|입고 있다|I wear a hat.
+put on|입다 / 착용하다|Put on your coat.
+take off|벗다|Take off your shoes.
+change|바꾸다|Change your clothes.
+buy|사다|I buy snacks.
+sell|팔다|They sell fruit.
+pay|지불하다|I pay money.
+save|저장하다 / 아끼다|Save your file.
+spend|쓰다|I spend time with friends.
+show|보여주다|Show me your picture.
+watch|보다 / 시청하다|I watch TV.
+hear|듣다 / 들리다|I hear music.
+smell|냄새 맡다|I smell flowers.
+taste|맛보다|Taste the soup.
+touch|만지다|Don't touch it.
+hold|잡다|Hold my hand.
+carry|나르다|Carry the box.
+throw|던지다|Throw the ball.
+catch|잡다|Catch the ball.
+kick|차다|Kick the ball.
+hit|치다|Hit the drum.
+clap|박수치다|Clap your hands.
+climb|오르다|Climb the stairs.
+fall|떨어지다|Don't fall.
+break|깨다 / 부수다|Don't break the glass.
+fix|고치다|Fix the toy.
+build|짓다 / 만들다|Build a house.
+grow|자라다 / 키우다|Plants grow.
+plant|심다|Plant a tree.
+water|물을 주다|Water the flowers.
+feed|먹이를 주다|Feed the dog.
+share|나누다|Share your snack.
+borrow|빌리다|Borrow a book.
+lend|빌려주다|Lend me a pencil.
+count|세다|Count the numbers.
+add|더하다|Add two numbers.
+check|확인하다|Check your answer.
+copy|복사하다 / 베끼다|Copy the sentence.
+type|타자 치다|Type your name.
+print|인쇄하다|Print the paper.
+click|클릭하다|Click the button.
+send|보내다|Send a message.
+receive|받다|I receive a gift.
+open up|마음을 열다|Open up to your friend.
+turn on|켜다|Turn on the light.
+turn off|끄다|Turn off the TV.
+look for|찾다|Look for your bag.
+look at|~을 보다|Look at the board.
+listen to|~을 듣다|Listen to the teacher.
+talk to|~에게 말하다|Talk to your friend.
+talk about|~에 대해 말하다|Talk about your day.
+get|얻다 / 받다|I get a sticker.
+become|~이 되다|I become happy.
+feel|느끼다|I feel good.
+seem|~처럼 보이다|You seem tired.
+keep|유지하다 / 보관하다|Keep quiet.
+let|~하게 하다|Let me try.
+begin|시작하다|Begin the game.
+end|끝나다|The class ends.
+win|이기다|We win the game.
+lose|지다 / 잃다|Don't lose your bag.
+join|참여하다|Join the club.
+practice|연습하다|Practice every day.
+review|복습하다|Review the words.
+prepare|준비하다|Prepare your books.
+follow|따르다|Follow the rules.
+lead|이끌다|Lead the team.
+arrive|도착하다|I arrive at school.
+return|돌아오다 / 돌려주다|Return the book.
+enter|들어가다|Enter the room.
+exit|나가다|Exit the room.
+cross|건너다|Cross the street.
+pass|지나가다 / 통과하다|Pass the test.
+miss|놓치다 / 그리워하다|I miss the bus.
+catch up|따라잡다|Catch up with the class.
+hurry|서두르다|Hurry up.
+rest|쉬다|Rest for a while.
+relax|쉬다 / 긴장을 풀다|Relax at home.
+exercise|운동하다|I exercise daily.
+skate|스케이트 타다|I skate in winter.
+ski|스키 타다|I ski well.
+shop|쇼핑하다|I shop with mom.
+travel|여행하다|I travel to Seoul.
+camp|캠핑하다|We camp outside.
+hope|바라다|I hope so.
+wish|바라다 / 소원하다|Make a wish.
+dream|꿈꾸다|I dream at night.
+plan|계획하다|Plan your day.
+decide|결정하다|Decide now.
+guess|추측하다|Guess the word.
+compare|비교하다|Compare the answers.
+match|맞추다 / 어울리다|Match the cards.
+order|주문하다 / 정리하다|Order the words.
+sort|분류하다|Sort the cards.
+mix|섞다|Mix the colors.
+shake|흔들다|Shake the bottle.
+fold|접다|Fold the paper.
+bend|구부리다|Bend your knees.
+cover|덮다|Cover the box.
+hide|숨기다|Hide the toy.
+seek|찾다|Seek the treasure.
+believe|믿다|I believe you.
+worry|걱정하다|Don't worry.
+care|돌보다 / 신경 쓰다|Care for your pet.
+thank|감사하다|Thank your teacher.
+welcome|환영하다|Welcome your friend.
+invite|초대하다|Invite your friend.
+enjoy|즐기다|Enjoy the game.
+hate|싫어하다|I hate bugs.
+prefer|더 좋아하다|I prefer milk.
+agree|동의하다|I agree with you.
+promise|약속하다|I promise.
+explain|설명하다|Explain your idea.
+describe|묘사하다|Describe the picture.
+introduce|소개하다|Introduce yourself.
+spell|철자를 말하다|Spell your name.
+repeat|반복하다|Repeat after me.
+read aloud|소리 내어 읽다|Read aloud, please.
+solve|풀다 / 해결하다|Solve the problem.
