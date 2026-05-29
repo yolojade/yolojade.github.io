@@ -232,7 +232,7 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        padding: 18px;
+        padding: 36px 18px 18px;
         text-align: center;
         position: relative;
       }
@@ -251,31 +251,53 @@
         left: 14px;
         background: var(--navy);
         color: white;
-        font-size: 15px;
+        font-size: 12px;
         font-weight: 800;
         padding: 5px 9px;
         border-radius: 999px;
       }
 
       .word {
-        font-size: 44px;
+        font-size: 40px;
         font-weight: 900;
         color: var(--navy);
-        margin-bottom: 10px;
+        margin-bottom: 8px;
       }
 
       .meaning {
-        font-size: 38px;
+        font-size: 34px;
         font-weight: 900;
         color: var(--green);
-        margin-bottom: 10px;
+        margin-bottom: 8px;
         word-break: keep-all;
       }
 
       .example {
-        font-size: 19px;
+        font-size: 18px;
         line-height: 1.45;
         color: #52606d;
+      }
+
+      .pronunciation {
+        color: #b45309;
+        font-size: 18px;
+        font-weight: 900;
+        line-height: 1.25;
+      }
+
+      .phonetic {
+        color: #475569;
+        font-size: 15px;
+        font-weight: 800;
+        line-height: 1.25;
+      }
+
+      .study-card .pronunciation {
+        font-size: 26px;
+      }
+
+      .study-card .phonetic {
+        font-size: 22px;
       }
 
       .print-page-title {
@@ -299,7 +321,7 @@
 
       @page {
         size: A4 portrait;
-        margin: 10mm;
+        margin: 8mm;
       }
 
       @media print {
@@ -310,6 +332,8 @@
 
         body {
           background: white;
+          margin: 0;
+          padding: 0;
         }
 
         header,
@@ -317,6 +341,7 @@
         .guide,
         .data-box,
         .status,
+        .print-adjust,
         .study-section,
         .view-title,
         #previewFront,
@@ -325,19 +350,18 @@
         }
 
         .print-page-title {
-          display: block;
-          text-align: center;
-          margin: 0 0 8mm;
-          font-size: 19px;
-          font-weight: 900;
-          color: #111;
+          display: none !important;
         }
 
         .print-sheet {
           display: grid !important;
-          grid-template-columns: repeat(4, 1fr);
-          grid-auto-rows: 45mm;
+          grid-template-columns: repeat(3, 1fr);
+          grid-auto-rows: 67mm;
           gap: 4mm;
+          margin: 0 auto;
+          padding: 0;
+          width: 194mm;
+          max-width: 194mm;
           page-break-after: always;
           break-after: page;
         }
@@ -347,8 +371,12 @@
           break-after: auto;
         }
 
+        .front-print-sheet {
+          transform: translateX(-1mm);
+        }
+
         .print-card {
-          height: 45mm;
+          height: 67mm;
           border: 1.3px solid #111;
           border-top: 3mm solid #ff9f1c;
           border-radius: 5mm;
@@ -359,7 +387,7 @@
           align-items: center;
           justify-content: center;
           text-align: center;
-          padding: 4mm;
+          padding: 7mm 4mm 4mm;
           position: relative;
           break-inside: avoid;
           page-break-inside: avoid;
@@ -377,25 +405,37 @@
           background: #10233f;
           color: white;
           border: 1px solid #10233f;
-          font-size: 11px;
+          font-size: 13px;
           padding: 1mm 2mm;
         }
 
         .print-card .word {
-          font-size: 31px;
-          margin-bottom: 2mm;
+          font-size: 40px;
+          margin-bottom: 1.5mm;
           color: #10233f;
         }
 
         .print-card .meaning {
-          font-size: 26px;
-          margin-bottom: 2mm;
+          font-size: 36px;
+          margin-bottom: 1.5mm;
           color: #0f5132;
         }
 
         .print-card .example {
-          font-size: 11px;
+          font-size: 16px;
           color: #333;
+        }
+
+        .print-card .pronunciation {
+          font-size: 16px;
+          color: #7c2d12;
+          margin-bottom: 0.8mm;
+        }
+
+        .print-card .phonetic {
+          font-size: 14px;
+          color: #333;
+          margin-bottom: 0.8mm;
         }
       }
     </style>
@@ -409,6 +449,13 @@
     <div class="toolbar">
       <button class="primary" onclick="window.print()">양면 인쇄하기</button>
       <button class="secondary" onclick="shuffleCards()">카드 섞기</button>
+      <button
+        class="outline"
+        id="pronunciationToggle"
+        onclick="togglePronunciation()"
+      >
+        발음/기호 보이기
+      </button>
       <button class="outline" onclick="resetCards()">
         기본 20개로 되돌리기
       </button>
@@ -446,13 +493,15 @@
           형식으로 입력하세요.
         </p>
         <pre>
-go|가다|I go to school.
+go|가다|I go to school.|고|/goʊ/
 come|오다|Come here.
 eat|먹다|I eat lunch.</pre
         >
         <p>
           한 줄에 한 단어씩 입력합니다. 형식은
-          <strong>영어|뜻|예문</strong> 입니다.
+          <strong>영어|뜻|예문</strong> 입니다. 발음을 직접 쓰고 싶으면
+          <strong>영어|뜻|예문|한글 발음|발음기호</strong> 형식도 사용할 수
+          있습니다.
         </p>
         <p>
           크롬에서 파일을 더블클릭으로 열면 보안 설정 때문에 data.txt 자동
@@ -498,6 +547,7 @@ eat|먹다|I eat lunch.</pre
       let words = [...defaultWords];
       let studyIndex = 0;
       let studyFlipped = false;
+      let showPronunciation = false;
 
       const studyCard = document.getElementById("studyCard");
       const previewFront = document.getElementById("previewFront");
@@ -505,6 +555,9 @@ eat|먹다|I eat lunch.</pre
       const printArea = document.getElementById("printArea");
       const statusEl = document.getElementById("status");
       const fileInput = document.getElementById("fileInput");
+      const pronunciationToggle = document.getElementById(
+        "pronunciationToggle",
+      );
 
       function parseDataText(text) {
         return text
@@ -517,6 +570,8 @@ eat|먹다|I eat lunch.</pre
               word: parts[0] || "",
               meaning: parts[1] || "",
               example: parts[2] || "",
+              pronunciation: parts[3] || "",
+              phonetic: parts[4] || "",
             };
           })
           .filter((item) => item.word && item.meaning);
@@ -548,7 +603,9 @@ eat|먹다|I eat lunch.</pre
         reader.onload = (e) => {
           const parsed = parseDataText(e.target.result);
           if (parsed.length === 0) {
-            alert("data.txt 형식을 확인해 주세요. 예: go|가다|I go to school.");
+            alert(
+              "data.txt 형식을 확인해 주세요. 예: go|가다|I go to school.|고|/goʊ/",
+            );
             return;
           }
           words = parsed;
@@ -571,6 +628,7 @@ eat|먹다|I eat lunch.</pre
         if (studyIndex < 0) studyIndex = 0;
 
         const item = words[studyIndex];
+        const pronunciationHtml = renderPronunciation(item);
         studyCard.className = studyFlipped
           ? "study-card is-back"
           : "study-card";
@@ -579,12 +637,14 @@ eat|먹다|I eat lunch.</pre
           studyCard.innerHTML = `
             <div class="study-meta">${studyIndex + 1} / ${words.length}</div>
             <div class="study-main">${escapeHtml(item.meaning)}</div>
+            ${pronunciationHtml}
             <div class="study-sub"><strong>${escapeHtml(item.word)}</strong><br>${escapeHtml(item.example || "")}</div>
           `;
         } else {
           studyCard.innerHTML = `
             <div class="study-meta">${studyIndex + 1} / ${words.length}</div>
             <div class="study-main">${escapeHtml(item.word)}</div>
+            ${pronunciationHtml}
             <div class="study-sub">${escapeHtml(item.example || "카드를 눌러 뜻 보기")}</div>
           `;
         }
@@ -622,16 +682,19 @@ eat|먹다|I eat lunch.</pre
         const card = document.createElement("section");
         card.className =
           type === "front" ? "card front-card" : "card back-card";
+        const pronunciationHtml = renderPronunciation(item);
         if (type === "front") {
           card.innerHTML = `
           <span class="number">${index + 1}</span>
           <div class="word">${escapeHtml(item.word)}</div>
+          ${pronunciationHtml}
           <div class="example">${escapeHtml(item.example || "")}</div>
         `;
         } else {
           card.innerHTML = `
           <span class="number">${index + 1}</span>
           <div class="meaning">${escapeHtml(item.meaning)}</div>
+          ${pronunciationHtml}
           <div class="example"><strong>${escapeHtml(item.word)}</strong><br>${escapeHtml(item.example || "")}</div>
         `;
         }
@@ -640,7 +703,7 @@ eat|먹다|I eat lunch.</pre
 
       function renderPrintPages() {
         printArea.innerHTML = "";
-        const chunkSize = 20;
+        const chunkSize = 12;
         const chunks = [];
         for (let i = 0; i < words.length; i += chunkSize)
           chunks.push(words.slice(i, i + chunkSize));
@@ -651,7 +714,7 @@ eat|먹다|I eat lunch.</pre
           frontTitle.textContent = `앞면 ${chunkIndex + 1}: 영어`;
 
           const frontSheet = document.createElement("section");
-          frontSheet.className = "print-sheet";
+          frontSheet.className = "print-sheet front-print-sheet";
           frontSheet.style.display = "none";
           chunk.forEach((item, index) =>
             frontSheet.appendChild(
@@ -664,12 +727,10 @@ eat|먹다|I eat lunch.</pre
           backTitle.textContent = `뒷면 ${chunkIndex + 1}: 뜻`;
 
           const backSheet = document.createElement("section");
-          backSheet.className = "print-sheet";
+          backSheet.className = "print-sheet back-print-sheet";
           backSheet.style.display = "none";
-          chunk.forEach((item, index) =>
-            backSheet.appendChild(
-              createPrintCard(item, chunkIndex * chunkSize + index, "back"),
-            ),
+          getBackPrintOrder(chunk).forEach(({ item, index }) =>
+            backSheet.appendChild(createPrintCard(item, index, "back")),
           );
 
           printArea.appendChild(frontTitle);
@@ -679,20 +740,38 @@ eat|먹다|I eat lunch.</pre
         });
       }
 
+      function getBackPrintOrder(chunk) {
+        const columns = 3;
+        const ordered = [];
+        for (let rowStart = 0; rowStart < chunk.length; rowStart += columns) {
+          const row = chunk
+            .slice(rowStart, rowStart + columns)
+            .map((item, index) => ({
+              item,
+              index: words.indexOf(item),
+            }));
+          ordered.push(...row.reverse());
+        }
+        return ordered;
+      }
+
       function createPrintCard(item, index, type) {
         const card = document.createElement("div");
         card.className =
           type === "back" ? "print-card back-print" : "print-card";
+        const pronunciationHtml = renderPronunciation(item);
         if (type === "front") {
           card.innerHTML = `
           <span class="number">${index + 1}</span>
           <div class="word">${escapeHtml(item.word)}</div>
+          ${pronunciationHtml}
           <div class="example">${escapeHtml(item.example || "")}</div>
         `;
         } else {
           card.innerHTML = `
           <span class="number">${index + 1}</span>
           <div class="meaning">${escapeHtml(item.meaning)}</div>
+          ${pronunciationHtml}
           <div class="example"><strong>${escapeHtml(item.word)}</strong><br>${escapeHtml(item.example || "")}</div>
         `;
         }
@@ -719,6 +798,525 @@ eat|먹다|I eat lunch.</pre
         studyFlipped = false;
         renderAll();
         statusEl.textContent = "기본 단어 20개로 되돌렸습니다.";
+      }
+
+      function togglePronunciation() {
+        showPronunciation = !showPronunciation;
+        pronunciationToggle.textContent = showPronunciation
+          ? "발음/기호 숨기기"
+          : "발음/기호 보이기";
+        renderAll();
+      }
+
+      function renderPronunciation(item) {
+        if (!showPronunciation) return "";
+        const pronunciation =
+          item.pronunciation || englishToKoreanPronunciation(item.word);
+        const phonetic = item.phonetic || englishToPhoneticSymbol(item.word);
+        return `
+          <div class="pronunciation">[${escapeHtml(pronunciation)}]</div>
+          <div class="phonetic">${escapeHtml(phonetic)}</div>
+        `;
+      }
+
+      function englishToPhoneticSymbol(value) {
+        const phonetics = {
+          add: "/æd/",
+          agree: "/əˈɡriː/",
+          answer: "/ˈæn.sɚ/",
+          arrive: "/əˈraɪv/",
+          ask: "/æsk/",
+          become: "/bɪˈkʌm/",
+          begin: "/bɪˈɡɪn/",
+          believe: "/bɪˈliːv/",
+          bend: "/bend/",
+          borrow: "/ˈbɑːr.oʊ/",
+          break: "/breɪk/",
+          bring: "/brɪŋ/",
+          build: "/bɪld/",
+          buy: "/baɪ/",
+          call: "/kɔːl/",
+          camp: "/kæmp/",
+          care: "/ker/",
+          carry: "/ˈker.i/",
+          catch: "/kætʃ/",
+          "catch up": "/kætʃ ʌp/",
+          change: "/tʃeɪndʒ/",
+          check: "/tʃek/",
+          choose: "/tʃuːz/",
+          clap: "/klæp/",
+          clean: "/kliːn/",
+          click: "/klɪk/",
+          climb: "/klaɪm/",
+          close: "/kloʊz/",
+          color: "/ˈkʌl.ɚ/",
+          come: "/kʌm/",
+          compare: "/kəmˈper/",
+          cook: "/kʊk/",
+          copy: "/ˈkɑː.pi/",
+          count: "/kaʊnt/",
+          cover: "/ˈkʌv.ɚ/",
+          cross: "/krɔːs/",
+          cry: "/kraɪ/",
+          cut: "/kʌt/",
+          dance: "/dæns/",
+          decide: "/dɪˈsaɪd/",
+          describe: "/dɪˈskraɪb/",
+          do: "/duː/",
+          draw: "/drɔː/",
+          dream: "/driːm/",
+          drink: "/drɪŋk/",
+          drive: "/draɪv/",
+          eat: "/iːt/",
+          end: "/end/",
+          enjoy: "/ɪnˈdʒɔɪ/",
+          enter: "/ˈen.tɚ/",
+          exercise: "/ˈek.sɚ.saɪz/",
+          exit: "/ˈek.sɪt/",
+          explain: "/ɪkˈspleɪn/",
+          fall: "/fɔːl/",
+          feed: "/fiːd/",
+          feel: "/fiːl/",
+          find: "/faɪnd/",
+          finish: "/ˈfɪn.ɪʃ/",
+          fix: "/fɪks/",
+          fly: "/flaɪ/",
+          fold: "/foʊld/",
+          follow: "/ˈfɑː.loʊ/",
+          forget: "/fɚˈɡet/",
+          get: "/ɡet/",
+          give: "/ɡɪv/",
+          go: "/goʊ/",
+          grow: "/ɡroʊ/",
+          guess: "/ɡes/",
+          hate: "/heɪt/",
+          have: "/hæv/",
+          hear: "/hɪr/",
+          help: "/help/",
+          hide: "/haɪd/",
+          hit: "/hɪt/",
+          hold: "/hoʊld/",
+          hope: "/hoʊp/",
+          hurry: "/ˈhɝː.i/",
+          introduce: "/ˌɪn.trəˈduːs/",
+          invite: "/ɪnˈvaɪt/",
+          join: "/dʒɔɪn/",
+          jump: "/dʒʌmp/",
+          keep: "/kiːp/",
+          kick: "/kɪk/",
+          know: "/noʊ/",
+          laugh: "/læf/",
+          lead: "/liːd/",
+          learn: "/lɝːn/",
+          leave: "/liːv/",
+          lend: "/lend/",
+          let: "/let/",
+          like: "/laɪk/",
+          listen: "/ˈlɪs.ən/",
+          "listen to": "/ˈlɪs.ən tuː/",
+          live: "/lɪv/",
+          look: "/lʊk/",
+          "look at": "/lʊk æt/",
+          "look for": "/lʊk fɔːr/",
+          lose: "/luːz/",
+          love: "/lʌv/",
+          make: "/meɪk/",
+          match: "/mætʃ/",
+          meet: "/miːt/",
+          miss: "/mɪs/",
+          mix: "/mɪks/",
+          move: "/muːv/",
+          need: "/niːd/",
+          open: "/ˈoʊ.pən/",
+          "open up": "/ˈoʊ.pən ʌp/",
+          order: "/ˈɔːr.dɚ/",
+          paint: "/peɪnt/",
+          pass: "/pæs/",
+          pay: "/peɪ/",
+          pick: "/pɪk/",
+          plan: "/plæn/",
+          plant: "/plænt/",
+          play: "/pleɪ/",
+          prefer: "/prɪˈfɝː/",
+          prepare: "/prɪˈper/",
+          practice: "/ˈpræk.tɪs/",
+          print: "/prɪnt/",
+          promise: "/ˈprɑː.mɪs/",
+          pull: "/pʊl/",
+          push: "/pʊʃ/",
+          put: "/pʊt/",
+          "put on": "/pʊt ɑːn/",
+          read: "/riːd/",
+          "read aloud": "/riːd əˈlaʊd/",
+          receive: "/rɪˈsiːv/",
+          relax: "/rɪˈlæks/",
+          remember: "/rɪˈmem.bɚ/",
+          repeat: "/rɪˈpiːt/",
+          rest: "/rest/",
+          return: "/rɪˈtɝːn/",
+          review: "/rɪˈvjuː/",
+          ride: "/raɪd/",
+          run: "/rʌn/",
+          save: "/seɪv/",
+          say: "/seɪ/",
+          see: "/siː/",
+          seek: "/siːk/",
+          seem: "/siːm/",
+          sell: "/sel/",
+          send: "/send/",
+          shake: "/ʃeɪk/",
+          share: "/ʃer/",
+          shop: "/ʃɑːp/",
+          show: "/ʃoʊ/",
+          sing: "/sɪŋ/",
+          sit: "/sɪt/",
+          skate: "/skeɪt/",
+          ski: "/skiː/",
+          sleep: "/sliːp/",
+          smell: "/smel/",
+          smile: "/smaɪl/",
+          solve: "/sɑːlv/",
+          speak: "/spiːk/",
+          spell: "/spel/",
+          spend: "/spend/",
+          stand: "/stænd/",
+          start: "/stɑːrt/",
+          stay: "/steɪ/",
+          stop: "/stɑːp/",
+          study: "/ˈstʌd.i/",
+          swim: "/swɪm/",
+          take: "/teɪk/",
+          "take off": "/teɪk ɔːf/",
+          talk: "/tɔːk/",
+          "talk about": "/tɔːk əˈbaʊt/",
+          "talk to": "/tɔːk tuː/",
+          taste: "/teɪst/",
+          teach: "/tiːtʃ/",
+          tell: "/tel/",
+          thank: "/θæŋk/",
+          think: "/θɪŋk/",
+          throw: "/θroʊ/",
+          touch: "/tʌtʃ/",
+          travel: "/ˈtræv.əl/",
+          try: "/traɪ/",
+          turn: "/tɝːn/",
+          "turn off": "/tɝːn ɔːf/",
+          "turn on": "/tɝːn ɑːn/",
+          type: "/taɪp/",
+          understand: "/ˌʌn.dɚˈstænd/",
+          use: "/juːz/",
+          visit: "/ˈvɪz.ɪt/",
+          wait: "/weɪt/",
+          wake: "/weɪk/",
+          walk: "/wɔːk/",
+          want: "/wɑːnt/",
+          wash: "/wɑːʃ/",
+          watch: "/wɑːtʃ/",
+          water: "/ˈwɔː.tɚ/",
+          wear: "/wer/",
+          welcome: "/ˈwel.kəm/",
+          win: "/wɪn/",
+          wish: "/wɪʃ/",
+          work: "/wɝːk/",
+          worry: "/ˈwɝː.i/",
+          write: "/raɪt/",
+        };
+
+        const normalized = String(value).toLowerCase().trim();
+        if (phonetics[normalized]) {
+          return phonetics[normalized];
+        }
+
+        const words = normalized.split(/\s+/).filter(Boolean);
+        const converted = words.map((word) => phonetics[word] || `/${word}/`);
+        return converted.join(" ").replaceAll("//", "/ /");
+      }
+
+      function englishToKoreanPronunciation(value) {
+        const specialPronunciations = {
+          add: "애드",
+          agree: "어그리",
+          answer: "앤서",
+          arrive: "어라이브",
+          ask: "애스크",
+          become: "비컴",
+          begin: "비긴",
+          believe: "빌리브",
+          bend: "벤드",
+          borrow: "바로우",
+          break: "브레이크",
+          bring: "브링",
+          build: "빌드",
+          buy: "바이",
+          call: "콜",
+          camp: "캠프",
+          care: "케어",
+          carry: "캐리",
+          catch: "캐치",
+          "catch up": "캐치 업",
+          change: "체인지",
+          check: "체크",
+          choose: "추즈",
+          clap: "클랩",
+          clean: "클린",
+          click: "클릭",
+          climb: "클라임",
+          close: "클로즈",
+          color: "컬러",
+          go: "고",
+          come: "컴",
+          compare: "컴페어",
+          cook: "쿡",
+          copy: "카피",
+          count: "카운트",
+          cover: "커버",
+          cross: "크로스",
+          cry: "크라이",
+          cut: "컷",
+          dance: "댄스",
+          decide: "디사이드",
+          describe: "디스크라이브",
+          do: "두",
+          draw: "드로",
+          dream: "드림",
+          drink: "드링크",
+          drive: "드라이브",
+          eat: "잇",
+          end: "엔드",
+          enjoy: "인조이",
+          enter: "엔터",
+          exercise: "엑서사이즈",
+          exit: "엑싯",
+          explain: "익스플레인",
+          fall: "폴",
+          feed: "피드",
+          feel: "필",
+          find: "파인드",
+          finish: "피니시",
+          fix: "픽스",
+          fly: "플라이",
+          fold: "폴드",
+          follow: "팔로우",
+          forget: "포겟",
+          get: "겟",
+          give: "기브",
+          grow: "그로우",
+          guess: "게스",
+          hate: "헤이트",
+          have: "해브",
+          hear: "히어",
+          help: "헬프",
+          hide: "하이드",
+          hit: "힛",
+          hold: "홀드",
+          hope: "호프",
+          hurry: "허리",
+          introduce: "인트로듀스",
+          invite: "인바이트",
+          join: "조인",
+          jump: "점프",
+          keep: "킵",
+          kick: "킥",
+          know: "노우",
+          laugh: "래프",
+          lead: "리드",
+          learn: "런",
+          leave: "리브",
+          lend: "렌드",
+          let: "렛",
+          like: "라이크",
+          listen: "리슨",
+          "listen to": "리슨 투",
+          live: "리브",
+          look: "룩",
+          "look at": "룩 앳",
+          "look for": "룩 포",
+          lose: "루즈",
+          love: "러브",
+          make: "메이크",
+          match: "매치",
+          meet: "밋",
+          miss: "미스",
+          mix: "믹스",
+          move: "무브",
+          need: "니드",
+          open: "오픈",
+          "open up": "오픈 업",
+          order: "오더",
+          paint: "페인트",
+          pass: "패스",
+          pay: "페이",
+          pick: "픽",
+          plan: "플랜",
+          plant: "플랜트",
+          play: "플레이",
+          prefer: "프리퍼",
+          prepare: "프리페어",
+          practice: "프랙티스",
+          print: "프린트",
+          promise: "프로미스",
+          pull: "풀",
+          push: "푸시",
+          put: "풋",
+          "put on": "풋 온",
+          read: "리드",
+          "read aloud": "리드 얼라우드",
+          receive: "리시브",
+          relax: "릴랙스",
+          remember: "리멤버",
+          repeat: "리핏",
+          rest: "레스트",
+          return: "리턴",
+          review: "리뷰",
+          ride: "라이드",
+          run: "런",
+          save: "세이브",
+          say: "세이",
+          see: "씨",
+          seek: "식",
+          seem: "심",
+          sell: "셀",
+          send: "센드",
+          shake: "셰이크",
+          share: "셰어",
+          shop: "샵",
+          show: "쇼",
+          sing: "싱",
+          sit: "싯",
+          skate: "스케이트",
+          ski: "스키",
+          sleep: "슬립",
+          smell: "스멜",
+          smile: "스마일",
+          solve: "솔브",
+          speak: "스피크",
+          spell: "스펠",
+          spend: "스펜드",
+          stand: "스탠드",
+          start: "스타트",
+          stay: "스테이",
+          stop: "스탑",
+          study: "스터디",
+          swim: "스윔",
+          take: "테이크",
+          "take off": "테이크 오프",
+          talk: "토크",
+          "talk about": "토크 어바웃",
+          "talk to": "토크 투",
+          taste: "테이스트",
+          teach: "티치",
+          tell: "텔",
+          thank: "땡크",
+          think: "씽크",
+          throw: "쓰로우",
+          touch: "터치",
+          travel: "트래블",
+          try: "트라이",
+          turn: "턴",
+          "turn off": "턴 오프",
+          "turn on": "턴 온",
+          type: "타입",
+          understand: "언더스탠드",
+          use: "유즈",
+          visit: "비짓",
+          wait: "웨이트",
+          wake: "웨이크",
+          walk: "워크",
+          want: "원트",
+          wash: "워시",
+          watch: "워치",
+          water: "워터",
+          wear: "웨어",
+          welcome: "웰컴",
+          win: "윈",
+          wish: "위시",
+          work: "워크",
+          worry: "워리",
+          write: "라이트",
+        };
+
+        const normalized = String(value).toLowerCase().trim();
+        if (specialPronunciations[normalized]) {
+          return specialPronunciations[normalized];
+        }
+
+        return normalized
+          .split(/\s+/)
+          .map(
+            (word) => specialPronunciations[word] || convertEnglishWord(word),
+          )
+          .join(" ");
+      }
+
+      function convertEnglishWord(word) {
+        const patterns = [
+          ["tion", "션"],
+          ["sion", "전"],
+          ["ture", "처"],
+          ["igh", "아이"],
+          ["ph", "프"],
+          ["sh", "쉬"],
+          ["ch", "치"],
+          ["th", "쓰"],
+          ["ck", "크"],
+          ["oo", "우"],
+          ["ee", "이"],
+          ["ea", "이"],
+          ["ai", "에이"],
+          ["ay", "에이"],
+          ["oa", "오우"],
+          ["ow", "오우"],
+          ["ou", "아우"],
+          ["ar", "아"],
+          ["er", "어"],
+          ["ir", "어"],
+          ["ur", "어"],
+          ["or", "오어"],
+        ];
+        const letters = {
+          a: "애",
+          b: "브",
+          c: "크",
+          d: "드",
+          e: "에",
+          f: "프",
+          g: "그",
+          h: "흐",
+          i: "이",
+          j: "즈",
+          k: "크",
+          l: "ㄹ",
+          m: "ㅁ",
+          n: "ㄴ",
+          o: "오",
+          p: "프",
+          q: "크",
+          r: "르",
+          s: "스",
+          t: "트",
+          u: "어",
+          v: "브",
+          w: "우",
+          x: "크스",
+          y: "이",
+          z: "즈",
+        };
+
+        let remaining = word.replace(/[^a-z]/g, "");
+        let result = "";
+        while (remaining) {
+          const match = patterns.find(([pattern]) =>
+            remaining.startsWith(pattern),
+          );
+          if (match) {
+            result += match[1];
+            remaining = remaining.slice(match[0].length);
+          } else {
+            result += letters[remaining[0]] || remaining[0];
+            remaining = remaining.slice(1);
+          }
+        }
+        return result;
       }
 
       function escapeHtml(value) {
