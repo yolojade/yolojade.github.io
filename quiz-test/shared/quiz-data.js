@@ -48,4 +48,11 @@ const QUIZZES = [
     description: "순차구조 심화 문제 풀기",
     quizTitle: "파이썬 퀴즈-순차구조 심화",
   },
+  {
+    id: "8",
+    file: "quiz8.txt",
+    title: "8번 문제",
+    description: "선택구조 심화 문제 풀기",
+    quizTitle: "파이썬 퀴즈-선택구조 심화",
+  },
 ];

@@ -1,0 +1,210 @@
+1
+print(123 == 123, end=" ")
+print(123 < 123)
+===
+True False
+
+2
+x = 10
+print("시작")
+if x == 10:
+    print("참입니다")
+===
+시작
+참입니다
+
+3
+x = -2
+y = 10
+if x == -2 and y == 10:
+    print("good")
+===
+good
+
+4
+x = 10
+if x > 10 or x < 10:
+    print("A")
+else:
+    print("B")
+===
+B
+
+5
+x = 3
+if x % 2 == 0:
+    print("짝수", end=" ")
+if x % 2 == 1:
+    print("홀수", end=" ")
+print(x+1)
+===
+홀수 4
+
+6
+age = 15
+if age > 10 and age < 20:
+    print("청소년")
+    age += 3
+print("다음")
+if age >= 20:
+    print("성인")
+print("끝")
+===
+청소년
+다음
+끝
+
+7
+a = 10
+b = 20
+if a < 20 and b < 30:
+    print("참")
+else:
+    print("거짓")
+===
+참
+
+8
+n = 30
+if n >= 10 or n >= 20:
+    n += 50
+    n -= 40
+n *= 2
+if n >= 30:
+    n //= 4
+print(n)
+===
+20
+
+9
+a = 80
+if a >= 80 and a < 100:
+    print("합격")
+else:
+    print("불합격")
+===
+합격
+
+10
+a = 20
+if a % 7 == 0 or a % 6 == 0:
+    print("O")
+else:
+    print("X")
+===
+X
+
+11
+n = 5
+if n == 5 or n == 10:
+    print("O")
+else:
+    print("X")
+===
+O
+
+12
+n = '7'
+if int(n) == 7:
+    print("O")
+else:
+    print("X")
+===
+O
+
+13
+x = 5
+if 3 < x < 7:
+    print("O")
+else:
+    print("X")
+===
+O
+
+14
+x = 9
+if 9 <= x < 10:
+    print("O")
+else:
+    print("X")
+===
+O
+
+15
+age = 16
+if 6 <= age <= 12:
+    print("730원")
+elif 13 <= age <= 18:
+    print("1010원")
+elif 19 <= age <= 65:
+    print("1450원")
+else:
+    print("무료입니다.")
+===
+1010원
+
+16
+num = 100
+if num > 70:
+    print("합격")
+    if num == 100:
+        print("우수상")
+else:
+    print("불합격")
+===
+합격
+우수상
+
+17
+n = 10
+if n > 3:
+    if n > 5:
+        print("A")
+    else:
+        print("B")
+print("C")
+===
+A
+C
+
+18
+n = 500
+if n > 10:
+    if n < 500:
+        print("A")
+    elif n < 1000:
+        print("B")
+    else:
+        print("C")
+print("D")
+===
+B
+D
+
+19
+n = 10
+if n > 10:
+    print("A")
+else:
+    if n > 5:
+        print("B")
+    print("C")
+print("D")
+===
+B
+C
+D
+
+20
+n = "Apple"
+if n[0] == 'a':
+    print("A")
+else:
+    if n[-1] == 'E':
+        print("B")
+    elif n[1] == n[-3]:
+        print("C")
+    else:
+        print("D")
+===
+C
