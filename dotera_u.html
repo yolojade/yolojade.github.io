@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>도테라 에센셜 오일 스마트 레시피 단가 계산기</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons (SVG 기반 고품질 아이콘) -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
+    body {
+      font-family: 'Noto Sans KR', 'Inter', sans-serif;
+    }
+    /* 인쇄 모드 최적화 */
+    @media print {
+      body { background-color: white; color: black; }
+      .no-print { display: none !important; }
+      .print-shadow-none { box-shadow: none !important; border: 1px solid #e2e8f0; }
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen pb-16">
+
+  <!-- 네비게이션 헤더 -->
+  <header class="bg-gradient-to-r from-violet-800 via-indigo-800 to-indigo-900 text-white shadow-md sticky top-0 z-40 no-print">
+    <div class="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+      <div class="flex items-center gap-3">
+        <div class="p-2.5 bg-white/10 rounded-xl">
+          <i data-lucide="droplet" class="w-7 h-7 text-purple-200 fill-purple-300"></i>
+        </div>
+        <div>
+          <h1 class="text-xl font-bold tracking-tight">도테라 에센셜 오일 스마트 단가 계산기</h1>
+          <p class="text-xs text-purple-200">doTERRA Smart Cost & Recipe Calculator</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="text-xs text-indigo-100 bg-white/10 px-3 py-1.5 rounded-full border border-white/15 flex items-center gap-1">
+          <i data-lucide="check-circle" class="w-3.5 h-3.5 text-emerald-400"></i> 공식 회원가 반영 완료
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <!-- 메인 레이아웃 -->
+  <main class="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
+    
+    <!-- 최상단 대시보드 요약 정보 카드 -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between print-shadow-none">
+        <div>
+          <p class="text-xs sm:text-sm font-medium text-slate-400">총 사용 방울</p>
+          <p class="text-xl sm:text-2xl font-bold text-slate-800 mt-1" id="totalDropsText">0방울</p>
+        </div>
+        <div class="p-3 bg-violet-50 rounded-xl text-violet-600">
+          <i data-lucide="layers" class="w-6 h-6"></i>
+        </div>
+      </div>
+      
+      <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between print-shadow-none">
+        <div>
+          <p class="text-xs sm:text-sm font-medium text-slate-400">레시피 총 원가</p>
+          <p class="text-xl sm:text-2xl font-bold text-indigo-600 mt-1" id="totalCostText">0원</p>
+        </div>
+        <div class="p-3 bg-indigo-50 rounded-xl text-indigo-600">
+          <i data-lucide="krw" class="w-6 h-6 text-indigo-600">₩</i>
+        </div>
+      </div>
+
+      <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between print-shadow-none">
+        <div>
+          <p class="text-xs sm:text-sm font-medium text-slate-400">평균 방울당 단가</p>
+          <p class="text-xl sm:text-2xl font-bold text-slate-800 mt-1" id="avgDropPriceText">0원</p>
+        </div>
+        <div class="p-3 bg-emerald-50 rounded-xl text-emerald-600">
+          <i data-lucide="activity" class="w-6 h-6"></i>
+        </div>
+      </div>
+
+      <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between print-shadow-none">
+        <div>
+          <p class="text-xs sm:text-sm font-medium text-slate-400">등록된 오일 종류</p>
+          <p class="text-xl sm:text-2xl font-bold text-slate-800 mt-1" id="oilCountText">0개</p>
+        </div>
+        <div class="p-3 bg-amber-50 rounded-xl text-amber-600">
+          <i data-lucide="database" class="w-6 h-6"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- 설정 및 알림 창 -->
+    <div class="bg-violet-50 border border-violet-100 rounded-2xl p-4 mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 no-print">
+      <div class="flex items-start gap-3">
+        <div class="p-2 bg-violet-100 rounded-lg text-violet-700 mt-0.5">
+          <i data-lucide="info" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h4 class="font-bold text-violet-900 text-sm sm:text-base">용량별 방울 수 자동 비례 시스템 작동 중</h4>
+          <p class="text-xs sm:text-sm text-violet-700 mt-0.5">
+            15ml 오일 병을 기준으로 지정된 방울 수에 맞춰 5ml, 10ml 등 다른 용량의 방울 수를 자동 계산합니다. (15ml=250방울 기준 시, 1ml당 약 16.67방울 적용)
+          </p>
+        </div>
+      </div>
+      <!-- 방울 수 기준 컨트롤러 -->
+      <div class="bg-white p-3 rounded-xl shadow-sm border border-violet-200/50 flex items-center gap-3 w-full md:w-auto">
+        <label class="text-xs sm:text-sm font-bold text-slate-700 whitespace-nowrap">15ml 기준 방울 수:</label>
+        <div class="flex items-center gap-1">
+          <input type="number" id="base15mlDrops" value="250" class="w-16 px-2 py-1 text-center font-bold border border-slate-300 rounded focus:outline-none focus:ring-2 focus:ring-violet-500 text-sm">
+          <span class="text-xs font-semibold text-slate-500">방울</span>
+        </div>
+        <button onclick="updateAllItemDropsByBase()" class="bg-violet-600 hover:bg-violet-700 text-white font-semibold text-xs px-2.5 py-1.5 rounded transition-all whitespace-nowrap">
+          모두 적용
+        </button>
+      </div>
+    </div>
+
+    <!-- 콘텐츠 영역: 2단 분할 레이아웃 -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      
+      <!-- 왼쪽: 레시피 작성 & 단가 계산 패널 (8칸) -->
+      <section class="lg:col-span-8 space-y-6">
+        
+        <!-- 레시피 상세 카드 -->
+        <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-4 sm:p-6 print-shadow-none">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-4 mb-4 border-b border-slate-100 gap-4">
+            <div class="w-full sm:w-auto">
+              <span class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2.5 py-1 rounded-full uppercase tracking-wider">나만의 천연 솔루션</span>
+              <input type="text" id="recipeNameInput" value="새로운 꿀조합 아로마 레시피" class="block w-full text-lg sm:text-xl font-bold text-slate-800 border-b border-transparent hover:border-slate-200 focus:border-indigo-500 focus:outline-none py-1 mt-1 transition-all" placeholder="레시피 제목을 입력해주세요.">
+            </div>
+            
+            <div class="flex flex-wrap gap-2 w-full sm:w-auto justify-end no-print">
+              <button onclick="loadExampleRecipe()" class="flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs sm:text-sm px-3.5 py-2 rounded-xl transition-all">
+                <i data-lucide="sparkles" class="w-4 h-4"></i> 추천 레시피
+              </button>
+              <button onclick="clearRecipe()" class="flex items-center gap-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 font-bold text-xs sm:text-sm px-3.5 py-2 rounded-xl transition-all">
+                <i data-lucide="trash-2" class="w-4 h-4"></i> 전체 초기화
+              </button>
+            </div>
+          </div>
+
+          <!-- 테이블 형식 (데스크톱 전용) 및 그리드 형식 (모바일 병행) -->
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse min-w-[700px]">
+              <thead>
+                <tr class="border-b border-slate-200 text-xs font-bold text-slate-400 uppercase tracking-wider bg-slate-50/50 rounded-t-lg">
+                  <th class="py-3 px-4 rounded-l-lg">분류 / 오일 정보</th>
+                  <th class="py-3 px-2 text-center">용량 (mL)</th>
+                  <th class="py-3 px-2 text-right">회원가 (원)</th>
+                  <th class="py-3 px-2 text-center">병당 총 방울수</th>
+                  <th class="py-3 px-2 text-right">방울당 단가</th>
+                  <th class="py-3 px-2 text-center" style="width: 100px;">사용 방울</th>
+                  <th class="py-3 px-3 text-right">소계 (원)</th>
+                  <th class="py-3 px-2 text-center rounded-r-lg no-print" style="width: 50px;">삭제</th>
+                </tr>
+              </thead>
+              <tbody id="recipeTableBody" class="divide-y divide-slate-100 text-sm">
+                <!-- 동적으로 아이템 행이 렌더링됩니다. -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- 테이블 하단 비어있을 때 안내문 -->
+          <div id="emptyState" class="hidden text-center py-12 px-4">
+            <div class="p-4 bg-slate-50 rounded-full w-14 h-14 flex items-center justify-center mx-auto mb-3">
+              <i data-lucide="droplet-off" class="w-7 h-7 text-slate-400"></i>
+            </div>
+            <p class="text-slate-500 font-medium">레시피에 추가된 오일이 없습니다.</p>
+            <p class="text-xs text-slate-400 mt-1">오른쪽 오일 가격표 검색에서 '레시피 추가'를 누르거나 아래 오일 직접 추가 버튼을 이용하세요!</p>
+          </div>
+
+          <!-- 행 추가 및 관리 섹션 -->
+          <div class="mt-6 flex flex-col sm:flex-row justify-between items-center gap-4 border-t border-slate-100 pt-6 no-print">
+            <button onclick="addCustomRow()" class="flex items-center gap-2 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white font-bold text-xs sm:text-sm px-5 py-3 rounded-2xl shadow-sm hover:shadow transition-all w-full sm:w-auto justify-center">
+              <i data-lucide="plus-circle" class="w-4 h-4"></i> 오일 직접 새로 만들기
+            </button>
+            <div class="flex gap-2 w-full sm:w-auto">
+              <button onclick="printRecipe()" class="flex-1 sm:flex-none flex items-center justify-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs sm:text-sm px-4 py-3 rounded-2xl transition-all">
+                <i data-lucide="printer" class="w-4 h-4"></i> 인쇄 / PDF 저장
+              </button>
+              <button onclick="shareRecipeLink()" class="flex-1 sm:flex-none flex items-center justify-center gap-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs sm:text-sm px-4 py-3 rounded-2xl transition-all">
+                <i data-lucide="share-2" class="w-4 h-4"></i> 카톡/공유 링크 생성
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 원가 비중 시각화 바 차트 -->
+        <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 print-shadow-none">
+          <h3 class="text-base font-bold text-slate-800 flex items-center gap-2 mb-4">
+            <i data-lucide="pie-chart" class="w-5 h-5 text-indigo-600"></i>
+            오일별 레시피 원가 비율 분석
+          </h3>
+          <div class="space-y-4">
+            <!-- 시각화 막대 바 -->
+            <div id="costProgressBar" class="w-full h-4 bg-slate-100 rounded-full overflow-hidden flex">
+              <!-- 동적 색상 바 추가됨 -->
+            </div>
+            <!-- 범례와 개별 항목 비율 -->
+            <div id="costLegend" class="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
+              <!-- 동적 범례 리스트 -->
+            </div>
+          </div>
+        </div>
+
+        <!-- 레시피 브라우저 저장소 (로컬 스토리지) -->
+        <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 no-print">
+          <h3 class="text-base font-bold text-slate-800 flex items-center gap-2 mb-4">
+            <i data-lucide="bookmark" class="w-5 h-5 text-amber-600"></i>
+            내 브라우저에 레시피 저장하기
+          </h3>
+          <div class="flex gap-2 mb-4">
+            <input type="text" id="saveRecipeName" placeholder="저장할 레시피 이름 지정" class="flex-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-violet-500">
+            <button onclick="saveCurrentRecipe()" class="bg-amber-600 hover:bg-amber-700 text-white font-bold text-sm px-5 py-2.5 rounded-xl transition-all whitespace-nowrap">
+              레시피 저장
+            </button>
+          </div>
+          <!-- 저장된 목록 -->
+          <div id="savedRecipesList" class="space-y-2 max-h-48 overflow-y-auto">
+            <!-- 동적으로 저장된 목록 렌더링 -->
+          </div>
+        </div>
+
+      </section>
+
+      <!-- 오른쪽: 도테라 검색 및 가격 데이터베이스 (4칸) -->
+      <section class="lg:col-span-4 space-y-6 no-print">
+        
+        <!-- 오일 가격 데이터베이스 탐색기 -->
+        <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-5">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
+              <i data-lucide="search" class="w-5 h-5 text-indigo-600"></i>
+              도테라 오일 회원가 검색
+            </h3>
+            <span class="text-[10px] text-slate-400 bg-slate-50 border border-slate-100 px-2 py-0.5 rounded-md font-semibold">버전: 2026.06</span>
+          </div>
+
+          <!-- 검색 필터 검색어 인풋 -->
+          <div class="relative mb-3">
+            <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+              <i data-lucide="search" class="w-4 h-4"></i>
+            </span>
+            <input type="text" id="oilSearchQuery" onkeyup="filterOils()" placeholder="오일 이름 검색 (예: 라벤더, 레몬)" class="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all">
+          </div>
+
+          <!-- 카테고리 탭 선택기 -->
+          <div class="grid grid-cols-4 gap-1 bg-slate-100 p-1 rounded-xl text-xs mb-4">
+            <button onclick="setCategoryFilter('all')" id="tab-all" class="py-1.5 rounded-lg font-bold text-center bg-white text-slate-800 shadow-sm transition-all">전체</button>
+            <button onclick="setCategoryFilter('싱글')" id="tab-싱글" class="py-1.5 rounded-lg font-bold text-center text-slate-500 hover:text-slate-800 transition-all">싱글</button>
+            <button onclick="setCategoryFilter('블렌드')" id="tab-블렌드" class="py-1.5 rounded-lg font-bold text-center text-slate-500 hover:text-slate-800 transition-all">블렌드</button>
+            <button onclick="setCategoryFilter('터치')" id="tab-터치" class="py-1.5 rounded-lg font-bold text-center text-slate-500 hover:text-slate-800 transition-all">롤온</button>
+          </div>
+
+          <!-- 오일 리스트 출력 -->
+          <div id="oilDatabaseContainer" class="space-y-2 max-h-[450px] overflow-y-auto pr-1">
+            <!-- 동적으로 검색 필터링된 오일 목록 출력 -->
+          </div>
+        </div>
+
+        <!-- 단가 계산 가이드라인 -->
+        <div class="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-3xl border border-indigo-100 p-5 text-xs text-indigo-900 space-y-3">
+          <h4 class="font-bold text-sm text-indigo-950 flex items-center gap-1.5">
+            <i data-lucide="help-circle" class="w-4 h-4 text-indigo-600"></i>
+            단가 계산 방식 가이드
+          </h4>
+          <ul class="space-y-2 list-disc pl-4 text-indigo-800">
+            <li><strong>방울 수 비례 법칙 적용:</strong> 도테라 오일의 15ml 병은 약 250방울로 정의됩니다. 따라서 1ml당 약 16.67방울이 들어가게 됩니다.</li>
+            <li><strong>용량 자동 계산:</strong>
+              <p class="mt-0.5">• <strong>5mL 용량:</strong> 250방울 * (5 / 15) = 83방울</p>
+              <p>• <strong>10mL 용량:</strong> 250방울 * (10 / 15) = 167방울</p>
+              <p>• <strong>15mL 용량:</strong> 250방울 * (15 / 15) = 250방울</p>
+            </li>
+            <li><strong>방울당 단가 구하기:</strong> 회원가격 ÷ 해당 용량의 총 방울수로 1방울당 단가를 구하고, 레시피에 들어가는 방울 수만큼 곱하여 최종 소계를 산출합니다.</li>
+          </ul>
+        </div>
+
+      </section>
+    </div>
+
+  </main>
+
+  <!-- 글로벌 토스트 팝업 알림 (alert 대용) -->
+  <div id="toast" class="fixed bottom-5 right-5 z-50 bg-slate-900 text-white px-5 py-3 rounded-2xl shadow-xl flex items-center gap-2 transform translate-y-20 opacity-0 transition-all duration-300">
+    <i data-lucide="bell" id="toastIcon" class="w-5 h-5 text-amber-400"></i>
+    <span id="toastMessage" class="text-sm font-medium">알림 내용</span>
+  </div>
+
+  <!-- 스크립트 작성 -->
+  <script>
+    // 1. 도테라 회원가 원본 데이터베이스 (한국 도테라 공식 회원가 기준)
+    const PRESET_OILS = [
+      // 싱글 오일 (Single Oils)
+      { name: "레몬", volume: 15, memberPrice: 20000, category: "싱글" },
+      { name: "페퍼민트", volume: 15, memberPrice: 36000, category: "싱글" },
+      { name: "라벤더", volume: 15, memberPrice: 40000, category: "싱글" },
+      { name: "티트리", volume: 15, memberPrice: 35000, category: "싱글" },
+      { name: "오렌지", volume: 15, memberPrice: 17000, category: "싱글" },
+      { name: "프랑킨센스", volume: 15, memberPrice: 104000, category: "싱글" },
+      { name: "오레가노", volume: 15, memberPrice: 41000, category: "싱글" },
+      { name: "자몽", volume: 15, memberPrice: 30000, category: "싱글" },
+      { name: "시더우드", volume: 15, memberPrice: 24000, category: "싱글" },
+      { name: "유칼립투스", volume: 15, memberPrice: 28000, category: "싱글" },
+      { name: "로즈마리", volume: 15, memberPrice: 26000, category: "싱글" },
+      { name: "코파이바", volume: 15, memberPrice: 54000, category: "싱글" },
+      { name: "일랑일랑", volume: 15, memberPrice: 57000, category: "싱글" },
+      { name: "베르가못", volume: 15, memberPrice: 45000, category: "싱글" },
+      { name: "마조람", volume: 15, memberPrice: 31000, category: "싱글" },
+      { name: "베티버", volume: 15, memberPrice: 65000, category: "싱글" },
+      { name: "사이프레스", volume: 15, memberPrice: 25000, category: "싱글" },
+      { name: "시베리안 퍼", volume: 15, memberPrice: 31000, category: "싱글" },
+      { name: "패출리", volume: 15, memberPrice: 48000, category: "싱글" },
+      { name: "라임", volume: 15, memberPrice: 20000, category: "싱글" },
+      { name: "그린만다린", volume: 15, memberPrice: 44000, category: "싱글" },
+      { name: "바질", volume: 15, memberPrice: 33000, category: "싱글" },
+      { name: "클래리세이지", volume: 15, memberPrice: 56000, category: "싱글" },
+      { name: "스피어민트", volume: 15, memberPrice: 42000, category: "싱글" },
+      { name: "블랙페퍼", volume: 5, memberPrice: 32000, category: "싱글" },
+      { name: "시나몬 바크", volume: 5, memberPrice: 38000, category: "싱글" },
+      { name: "주니퍼베리", volume: 5, memberPrice: 28000, category: "싱글" },
+      { name: "멜리사", volume: 5, memberPrice: 138000, category: "싱글" },
+      { name: "로만캐모마일", volume: 5, memberPrice: 65000, category: "싱글" },
+      { name: "샌달우드", volume: 5, memberPrice: 102000, category: "싱글" },
+      { name: "헬리크리섬", volume: 5, memberPrice: 107000, category: "싱글" },
+      { name: "아버비테", volume: 5, memberPrice: 32000, category: "싱글" },
+
+      // 블렌드 오일 (Blend Oils)
+      { name: "이지에어", volume: 15, memberPrice: 39000, category: "블렌드" },
+      { name: "온가드", volume: 15, memberPrice: 52000, category: "블렌드" },
+      { name: "다이제스트젠", volume: 15, memberPrice: 54000, category: "블렌드" },
+      { name: "세레니티", volume: 15, memberPrice: 56000, category: "블렌드" },
+      { name: "밸런스", volume: 15, memberPrice: 30000, category: "블렌드" },
+      { name: "아로마터치", volume: 15, memberPrice: 41000, category: "블렌드" },
+      { name: "테라쉴드", volume: 15, memberPrice: 15000, category: "블렌드" },
+      { name: "어댑티브", volume: 15, memberPrice: 48000, category: "블렌드" },
+      { name: "딥블루", volume: 5, memberPrice: 48000, category: "블렌드" },
+      { name: "치어", volume: 5, memberPrice: 36000, category: "블렌드" },
+      { name: "콘솔", volume: 5, memberPrice: 54000, category: "블렌드" },
+      { name: "모티베이트", volume: 5, memberPrice: 33000, category: "블렌드" },
+      { name: "패션", volume: 5, memberPrice: 61000, category: "블렌드" },
+
+      // 터치 / 롤온 (Touch / Roll-on - 보통 10ml)
+      { name: "프랑킨센스 터치", volume: 10, memberPrice: 36000, category: "터치" },
+      { name: "로즈 터치", volume: 10, memberPrice: 102000, category: "터치" },
+      { name: "오레가노 터치", volume: 10, memberPrice: 30000, category: "터치" },
+      { name: "이지에어 터치", volume: 10, memberPrice: 24000, category: "터치" },
+      { name: "라벤더 터치", volume: 10, memberPrice: 25000, category: "터치" },
+      { name: "티트리 터치", volume: 10, memberPrice: 24000, category: "터치" },
+      { name: "페퍼민트 터치", volume: 10, memberPrice: 24000, category: "터치" },
+      { name: "온가드 터치", volume: 10, memberPrice: 31000, category: "터치" },
+      { name: "다이제스트젠 터치", volume: 10, memberPrice: 31000, category: "터치" },
+      { name: "인튠", volume: 10, memberPrice: 50000, category: "터치" },
+      { name: "클리어리파이 터치", volume: 10, memberPrice: 25000, category: "터치" },
+      { name: "마조람 터치", volume: 10, memberPrice: 24000, category: "터치" },
+    ];
+
+    // 색상 팔레트 (레시피 분석 그래프 색상용)
+    const COLORS = [
+      'bg-indigo-500', 'bg-emerald-500', 'bg-purple-500', 'bg-amber-500', 
+      'bg-rose-500', 'bg-teal-500', 'bg-sky-500', 'bg-fuchsia-500', 'bg-orange-500'
+    ];
+
+    // 2. 전역 애플리케이션 상태(State) 관리
+    let state = {
+      recipeItems: [],       // 현재 레시피 테이블에 올라간 아이템 목록
+      currentCategory: 'all', // 검색 필터링용 탭
+      searchQuery: '',       // 검색 키워드
+    };
+
+    // 3. 라이프사이클 이닛
+    window.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      initApp();
+    });
+
+    function initApp() {
+      // 1) URL에 레시피 파라미터가 인코딩되어 있는지 검증하여 자동 추가
+      const urlParams = new URLSearchParams(window.location.search);
+      const encodedRecipe = urlParams.get('recipe');
+      
+      if (encodedRecipe) {
+        try {
+          const decodedData = JSON.parse(decodeURIComponent(escape(atob(encodedRecipe))));
+          if (decodedData && Array.isArray(decodedData.items)) {
+            state.recipeItems = decodedData.items;
+            if (decodedData.baseDrops) {
+              document.getElementById('base15mlDrops').value = decodedData.baseDrops;
+            }
+            if (decodedData.name) {
+              document.getElementById('recipeNameInput').value = decodedData.name;
+            }
+            showToast('check-circle', 'emerald-500', '공유된 레시피를 성공적으로 불러왔습니다!');
+          }
+        } catch (e) {
+          console.error("URL 레시피 복호화 에러: ", e);
+          showToast('alert-triangle', 'rose-500', '레시피를 불러오는데 실패했습니다.');
+          loadExampleRecipe();
+        }
+      } else {
+        // 기본값으로 예시 레시피 로드
+        loadExampleRecipe();
+      }
+
+      // 2) 오일 가격 데이터베이스 탐색기 드로잉
+      renderOilDatabase();
+      
+      // 3) 로컬 브라우저 저장소 데이터 로드
+      renderSavedRecipesList();
+
+      // 4) 레시피 상태 계산 및 렌더링
+      calculateAndRender();
+    }
+
+    // 4. 레시피 아이템 추가/수정 함수
+    function getBaseDrops() {
+      const inputVal = parseInt(document.getElementById('base15mlDrops').value);
+      return isNaN(inputVal) || inputVal <= 0 ? 250 : inputVal;
+    }
+
+    // 용량 변경에 따른 방울수 계산 헬퍼 함수
+    function calculateDropsForVolume(volume, base15ml) {
+      return Math.round((volume / 15) * base15ml);
+    }
+
+    // 데이터베이스 오일을 레시피로 추가
+    function addOilToRecipe(name, volume, memberPrice, category) {
+      const baseDrops = getBaseDrops();
+      const dropsPerBottle = calculateDropsForVolume(volume, baseDrops);
+      
+      const newItem = {
+        id: Date.now() + Math.random().toString(36).substr(2, 5),
+        name: name,
+        volume: volume,
+        memberPrice: memberPrice,
+        dropsPerBottle: dropsPerBottle,
+        recipeDrops: 2, // 기본값 2방울 설정
+        category: category || "싱글"
+      };
+
+      state.recipeItems.push(newItem);
+      showToast('plus', 'violet-500', `[${name}] 레시피에 추가되었습니다.`);
+      calculateAndRender();
+    }
+
+    // 사용자가 직접 새 비규격 오일이나 공병 등 추가 가능하도록 수동 추가 지원
+    function addCustomRow() {
+      const baseDrops = getBaseDrops();
+      const newItem = {
+        id: Date.now() + Math.random().toString(36).substr(2, 5),
+        name: "커스텀 오일/공병",
+        volume: 15,
+        memberPrice: 10000,
+        dropsPerBottle: baseDrops,
+        recipeDrops: 1,
+        category: "사용자정의"
+      };
+
+      state.recipeItems.push(newItem);
+      showToast('plus-circle', 'violet-500', '새로운 편집 가능한 빈 열이 추가되었습니다.');
+      calculateAndRender();
+    }
+
+    // 레시피 항목 삭제
+    function deleteRow(id, name) {
+      state.recipeItems = state.recipeItems.filter(item => item.id !== id);
+      showToast('trash-2', 'rose-500', `[${name}] 레시피에서 삭제했습니다.`);
+      calculateAndRender();
+    }
+
+    // 테이블 수정 이벤트 전파 핸들러
+    function handleFieldUpdate(id, field, value) {
+      const item = state.recipeItems.find(i => i.id === id);
+      if (!item) return;
+
+      if (field === 'name') {
+        item.name = value;
+      } else if (field === 'volume') {
+        item.volume = parseFloat(value) || 0;
+        // 용량 변경 시 방울 수 비율에 맞춤 자동 재산출
+        item.dropsPerBottle = calculateDropsForVolume(item.volume, getBaseDrops());
+      } else if (field === 'memberPrice') {
+        item.memberPrice = parseInt(value) || 0;
+      } else if (field === 'dropsPerBottle') {
+        item.dropsPerBottle = parseInt(value) || 1;
+      } else if (field === 'recipeDrops') {
+        item.recipeDrops = parseInt(value) || 0;
+      }
+
+      calculateAndRender();
+    }
+
+    // 상단의 15ml 기본 방울 수 설정을 변경했을 때 전체 아이템 일괄 반영
+    function updateAllItemDropsByBase() {
+      const baseDrops = getBaseDrops();
+      state.recipeItems.forEach(item => {
+        // 수동 커스텀이 아닌 한 표준 ml에 근거해서 방울 수를 재조정함
+        if ([5, 10, 15].includes(item.volume)) {
+          item.dropsPerBottle = calculateDropsForVolume(item.volume, baseDrops);
+        }
+      });
+      showToast('check-circle', 'violet-500', `15ml 기준 방울 수가 ${baseDrops}방울로 업데이트 되었습니다.`);
+      calculateAndRender();
+    }
+
+    // 5. 추천 예시 레시피 로딩
+    function loadExampleRecipe() {
+      const baseDrops = getBaseDrops();
+      document.getElementById('recipeNameInput').value = "온가드 면역 보호 오일 롤온";
+      
+      state.recipeItems = [
+        {
+          id: 'ex-1',
+          name: "온가드",
+          volume: 15,
+          memberPrice: 52000,
+          dropsPerBottle: calculateDropsForVolume(15, baseDrops),
+          recipeDrops: 10,
+          category: "블렌드"
+        },
+        {
+          id: 'ex-2',
+          name: "레몬",
+          volume: 15,
+          memberPrice: 20000,
+          dropsPerBottle: calculateDropsForVolume(15, baseDrops),
+          recipeDrops: 8,
+          category: "싱글"
+        },
+        {
+          id: 'ex-3',
+          name: "프랑킨센스 터치",
+          volume: 10,
+          memberPrice: 36000,
+          dropsPerBottle: calculateDropsForVolume(10, baseDrops),
+          recipeDrops: 5,
+          category: "터치"
+        },
+        {
+          id: 'ex-4',
+          name: "라벤더",
+          volume: 15,
+          memberPrice: 40000,
+          dropsPerBottle: calculateDropsForVolume(15, baseDrops),
+          recipeDrops: 5,
+          category: "싱글"
+        }
+      ];
+
+      showToast('sparkles', 'indigo-600', '추천 면역 강화 레시피가 성공적으로 로드되었습니다.');
+      calculateAndRender();
+    }
+
+    // 레시피 초기화
+    function clearRecipe() {
+      state.recipeItems = [];
+      document.getElementById('recipeNameInput').value = "새로운 꿀조합 아로마 레시피";
+      showToast('trash-2', 'rose-500', '모든 레시피 항목이 삭제되었습니다.');
+      calculateAndRender();
+    }
+
+    // 6. 계산 및 화면 렌더링 동기화
+    function calculateAndRender() {
+      const tableBody = document.getElementById('recipeTableBody');
+      const emptyState = document.getElementById('emptyState');
+      
+      tableBody.innerHTML = '';
+      
+      if (state.recipeItems.length === 0) {
+        emptyState.classList.remove('hidden');
+      } else {
+        emptyState.classList.add('hidden');
+        
+        state.recipeItems.forEach((item, index) => {
+          // 계산 프로세스
+          const pricePerDrop = item.dropsPerBottle > 0 ? (item.memberPrice / item.dropsPerBottle) : 0;
+          const subtotal = pricePerDrop * item.recipeDrops;
+          
+          const rowHtml = `
+            <tr class="hover:bg-slate-50 transition-all">
+              <td class="py-3 px-4">
+                <div class="flex flex-col">
+                  <span class="text-xs font-bold text-indigo-500 mb-0.5">[${item.category}]</span>
+                  <input type="text" value="${item.name}" onchange="handleFieldUpdate('${item.id}', 'name', this.value)" class="font-semibold text-slate-800 bg-transparent border-b border-transparent hover:border-slate-300 focus:border-indigo-500 focus:outline-none py-0.5">
+                </div>
+              </td>
+              <td class="py-3 px-2 text-center">
+                <select onchange="handleFieldUpdate('${item.id}', 'volume', this.value)" class="bg-slate-50 border border-slate-200 rounded-lg py-1 px-1.5 focus:outline-none focus:ring-1 focus:ring-indigo-500 font-medium text-xs">
+                  <option value="5" ${item.volume === 5 ? 'selected' : ''}>5 ml</option>
+                  <option value="10" ${item.volume === 10 ? 'selected' : ''}>10 ml</option>
+                  <option value="15" ${item.volume === 15 ? 'selected' : ''}>15 ml</option>
+                  <option value="30" ${item.volume === 30 ? 'selected' : ''}>30 ml</option>
+                  <option value="${item.volume}" ${![5,10,15,30].includes(item.volume) ? 'selected' : ''}>직접: ${item.volume}ml</option>
+                </select>
+              </td>
+              <td class="py-3 px-2 text-right">
+                <div class="flex items-center justify-end gap-1">
+                  <input type="number" value="${item.memberPrice}" onchange="handleFieldUpdate('${item.id}', 'memberPrice', this.value)" class="w-20 text-right bg-slate-50 border border-slate-200 rounded-lg py-1 px-2 focus:outline-none focus:ring-1 focus:ring-indigo-500 text-xs font-semibold">
+                  <span class="text-slate-400 text-xs">원</span>
+                </div>
+              </td>
+              <td class="py-3 px-2 text-center font-semibold text-slate-600">
+                <div class="flex items-center justify-center gap-1">
+                  <input type="number" value="${item.dropsPerBottle}" onchange="handleFieldUpdate('${item.id}', 'dropsPerBottle', this.value)" class="w-14 text-center bg-slate-50 border border-slate-200 rounded-lg py-1 px-1 focus:outline-none focus:ring-1 focus:ring-indigo-500 text-xs font-semibold">
+                  <span class="text-slate-400 text-[10px]">방울</span>
+                </div>
+              </td>
+              <td class="py-3 px-2 text-right font-medium text-slate-500 text-xs">
+                ${Math.round(pricePerDrop).toLocaleString()}원/방울
+              </td>
+              <td class="py-3 px-2 text-center">
+                <div class="flex items-center justify-center gap-1">
+                  <input type="number" value="${item.recipeDrops}" onchange="handleFieldUpdate('${item.id}', 'recipeDrops', this.value)" class="w-14 text-center border-2 border-indigo-200 rounded-lg py-1 px-1 focus:outline-none focus:border-indigo-500 font-bold text-indigo-700 bg-indigo-50/30 text-sm">
+                  <span class="text-slate-400 text-xs">방울</span>
+                </div>
+              </td>
+              <td class="py-3 px-3 text-right font-bold text-slate-800">
+                ${Math.round(subtotal).toLocaleString()}원
+              </td>
+              <td class="py-3 px-2 text-center no-print">
+                <button onclick="deleteRow('${item.id}', '${item.name}')" class="text-rose-400 hover:text-rose-600 p-1 rounded-full hover:bg-rose-50 transition-all">
+                  <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+              </td>
+            </tr>
+          `;
+          tableBody.insertAdjacentHTML('beforeend', rowHtml);
+        });
+      }
+
+      // 7. 총합계 산출 계산부
+      let totalDrops = 0;
+      let totalCost = 0;
+      
+      state.recipeItems.forEach(item => {
+        const pricePerDrop = item.dropsPerBottle > 0 ? (item.memberPrice / item.dropsPerBottle) : 0;
+        totalDrops += item.recipeDrops;
+        totalCost += (pricePerDrop * item.recipeDrops);
+      });
+
+      const avgDropPrice = totalDrops > 0 ? (totalCost / totalDrops) : 0;
+
+      // 상단 지표 카드 출력 바인딩
+      document.getElementById('totalDropsText').innerText = `${totalDrops}방울`;
+      document.getElementById('totalCostText').innerText = `${Math.round(totalCost).toLocaleString()}원`;
+      document.getElementById('avgDropPriceText').innerText = `${Math.round(avgDropPrice).toLocaleString()}원`;
+      document.getElementById('oilCountText').innerText = `${state.recipeItems.length}개`;
+
+      // 루사이드 아이콘 갱신 바인딩
+      lucide.createIcons();
+
+      // 그래프 시각화 및 범례 드로잉
+      renderCostBreakdown(totalCost);
+    }
+
+    // 8. 레시피 내 오일 원가 비중 분석 차트 렌더링
+    function renderCostBreakdown(totalCost) {
+      const progressBar = document.getElementById('costProgressBar');
+      const legendContainer = document.getElementById('costLegend');
+      
+      progressBar.innerHTML = '';
+      legendContainer.innerHTML = '';
+
+      if (state.recipeItems.length === 0 || totalCost === 0) {
+        progressBar.innerHTML = `<div class="w-full h-full bg-slate-100 flex items-center justify-center text-[10px] text-slate-400 font-semibold">데이터 없음</div>`;
+        legendContainer.innerHTML = '<p class="text-slate-400 text-center col-span-full py-2">레시피 구성 오일이 없으므로 데이터가 나타나지 않습니다.</p>';
+        return;
+      }
+
+      state.recipeItems.forEach((item, index) => {
+        const pricePerDrop = item.dropsPerBottle > 0 ? (item.memberPrice / item.dropsPerBottle) : 0;
+        const itemCost = pricePerDrop * item.recipeDrops;
+        const percentage = (itemCost / totalCost) * 100;
+        const colorClass = COLORS[index % COLORS.length];
+
+        if (percentage > 0) {
+          // 비주얼 누적 막대바 생성
+          const barSegment = `<div class="${colorClass} h-full transition-all" style="width: ${percentage}%" title="${item.name}: ${Math.round(percentage)}%"></div>`;
+          progressBar.insertAdjacentHTML('beforeend', barSegment);
+
+          // 하단 범례 카드 목록 생성
+          const legendItem = `
+            <div class="flex items-center gap-2 p-2 bg-slate-50 border border-slate-100 rounded-xl">
+              <span class="w-3 h-3 rounded-full ${colorClass}"></span>
+              <div class="flex-1 min-w-0">
+                <p class="font-semibold text-slate-800 truncate">${item.name}</p>
+                <p class="text-[10px] text-slate-400 font-bold">${Math.round(percentage)}% (${Math.round(itemCost).toLocaleString()}원)</p>
+              </div>
+            </div>
+          `;
+          legendContainer.insertAdjacentHTML('beforeend', legendItem);
+        }
+      });
+    }
+
+    // 9. 오일 데이터베이스 검색 및 렌더링
+    function renderOilDatabase() {
+      const container = document.getElementById('oilDatabaseContainer');
+      container.innerHTML = '';
+
+      // 필터링 규칙 적용
+      const filtered = PRESET_OILS.filter(oil => {
+        const matchesCategory = state.currentCategory === 'all' || oil.category === state.currentCategory;
+        const matchesSearch = oil.name.includes(state.searchQuery);
+        return matchesCategory && matchesSearch;
+      });
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-8">
+            <p class="text-xs text-slate-400 font-semibold">검색 조건과 맞는 오일이 존재하지 않습니다.</p>
+          </div>
+        `;
+        return;
+      }
+
+      filtered.forEach(oil => {
+        // 회원가 포맷팅
+        const priceString = oil.memberPrice.toLocaleString();
+        const baseDrops = getBaseDrops();
+        const dropsEstimated = calculateDropsForVolume(oil.volume, baseDrops);
+        const dropCostEstimated = Math.round(oil.memberPrice / dropsEstimated);
+
+        const cardHtml = `
+          <div class="bg-slate-50 hover:bg-slate-100/80 border border-slate-100 hover:border-indigo-100 rounded-2xl p-3 flex justify-between items-center transition-all group">
+            <div class="min-w-0">
+              <div class="flex items-center gap-1.5">
+                <span class="text-[9px] font-bold text-indigo-600 bg-indigo-50 border border-indigo-100/50 px-1.5 py-0.5 rounded-md">${oil.category}</span>
+                <h4 class="font-bold text-slate-800 text-sm truncate">${oil.name}</h4>
+              </div>
+              <p class="text-xs text-slate-400 mt-1 font-semibold">${oil.volume}ml | ${priceString}원 <span class="text-slate-300">/</span> <span class="text-indigo-600">${dropCostEstimated}원/방울</span></p>
+            </div>
+            <button onclick="addOilToRecipe('${oil.name}', ${oil.volume}, ${oil.memberPrice}, '${oil.category}')" class="bg-white hover:bg-indigo-600 border border-slate-200 group-hover:border-indigo-600 text-slate-600 group-hover:text-white px-3 py-1.5 rounded-xl font-bold text-xs transition-all flex items-center gap-1 shadow-sm">
+              <i data-lucide="plus" class="w-3.5 h-3.5"></i> 레시피 추가
+            </button>
+          </div>
+        `;
+        container.insertAdjacentHTML('beforeend', cardHtml);
+      });
+
+      // 아이콘 업데이트
+      lucide.createIcons();
+    }
+
+    // 카테고리 필터 변경 탭 핸들러
+    function setCategoryFilter(category) {
+      state.currentCategory = category;
+      
+      // 탭 액티브 스타일 클래스 변경
+      ['all', '싱글', '블렌드', '터치'].forEach(cat => {
+        const tab = document.getElementById(`tab-${cat}`);
+        if (cat === category) {
+          tab.className = "py-1.5 rounded-lg font-bold text-center bg-white text-indigo-700 shadow-sm transition-all";
+        } else {
+          tab.className = "py-1.5 rounded-lg font-bold text-center text-slate-500 hover:text-indigo-600 transition-all";
+        }
+      });
+
+      renderOilDatabase();
+    }
+
+    // 검색어 입력 핸들러
+    function filterOils() {
+      state.searchQuery = document.getElementById('oilSearchQuery').value.trim();
+      renderOilDatabase();
+    }
+
+    // 10. 레시피 카카오톡 / SNS 공유를 위한 링크 생성 (Base64 인코딩)
+    function shareRecipeLink() {
+      if (state.recipeItems.length === 0) {
+        showToast('alert-circle', 'rose-500', '최소 1개 이상의 오일이 포함되어야 링크를 생성할 수 있습니다.');
+        return;
+      }
+
+      try {
+        const recipePayload = {
+          name: document.getElementById('recipeNameInput').value,
+          baseDrops: getBaseDrops(),
+          items: state.recipeItems.map(item => ({
+            name: item.name,
+            volume: item.volume,
+            memberPrice: item.memberPrice,
+            dropsPerBottle: item.dropsPerBottle,
+            recipeDrops: item.recipeDrops,
+            category: item.category
+          }))
+        };
+
+        // 한글 깨짐 방지용 유니코드 우회 base64 인코딩
+        const jsonStr = JSON.stringify(recipePayload);
+        const base64Encoded = btoa(unescape(encodeURIComponent(jsonStr)));
+        const shareUrl = `${window.location.origin}${window.location.pathname}?recipe=${base64Encoded}`;
+
+        // 클립보드 복사 유틸리티 호출 (iframe 이슈 완벽 보안 처리)
+        copyToClipboard(shareUrl);
+        showToast('share-2', 'indigo-500', '공유 링크가 클립보드에 복사되었습니다! 카톡에 붙여넣기 하세요.');
+      } catch (e) {
+        console.error(e);
+        showToast('alert-triangle', 'rose-500', '공유용 링크 생성 중 에러가 발생했습니다.');
+      }
+    }
+
+    // Clipboard Copy 보안 우회 유틸리티
+    function copyToClipboard(text) {
+      const tempInput = document.createElement("input");
+      tempInput.style.position = "absolute";
+      tempInput.style.left = "-9999px";
+      tempInput.value = text;
+      document.body.appendChild(tempInput);
+      tempInput.select();
+      document.execCommand("copy");
+      document.body.removeChild(tempInput);
+    }
+
+    // 11. 로컬 저장소 브라우저 저장 기능
+    function saveCurrentRecipe() {
+      const saveNameInput = document.getElementById('saveRecipeName');
+      const name = saveNameInput.value.trim();
+      
+      if (!name) {
+        showToast('alert-circle', 'rose-500', '저장할 레시피 이름을 입력해주세요.');
+        return;
+      }
+      if (state.recipeItems.length === 0) {
+        showToast('alert-circle', 'rose-500', '저장할 오일 레시피가 비어있습니다.');
+        return;
+      }
+
+      try {
+        const localRecipes = JSON.parse(localStorage.getItem('dotera_saved_recipes') || '{}');
+        localRecipes[name] = {
+          title: document.getElementById('recipeNameInput').value,
+          baseDrops: getBaseDrops(),
+          items: state.recipeItems,
+          savedAt: new Date().toISOString()
+        };
+        localStorage.setItem('dotera_saved_recipes', JSON.stringify(localRecipes));
+        
+        saveNameInput.value = '';
+        showToast('bookmark', 'amber-500', `"${name}" 레시피가 내 브라우저에 영구 저장되었습니다.`);
+        renderSavedRecipesList();
+      } catch (e) {
+        console.error(e);
+        showToast('alert-triangle', 'rose-500', '로컬 스토리지 한도초과 또는 접근불가 에러입니다.');
+      }
+    }
+
+    // 로컬 저장 레시피 로드
+    function loadSavedRecipe(name) {
+      try {
+        const localRecipes = JSON.parse(localStorage.getItem('dotera_saved_recipes') || '{}');
+        const target = localRecipes[name];
+        if (target) {
+          state.recipeItems = target.items;
+          document.getElementById('base15mlDrops').value = target.baseDrops || 250;
+          document.getElementById('recipeNameInput').value = target.title || name;
+          
+          showToast('bookmark', 'violet-500', `"${name}" 레시피를 성공적으로 불러왔습니다.`);
+          calculateAndRender();
+        }
+      } catch (e) {
+        console.error(e);
+        showToast('alert-triangle', 'rose-500', '레시피를 로딩하는 도중 오류가 발생했습니다.');
+      }
+    }
+
+    // 로컬 저장 레시피 삭제
+    function deleteSavedRecipe(name, event) {
+      if(event) event.stopPropagation(); // 카드 선택 이벤트 전파 방지
+      try {
+        const localRecipes = JSON.parse(localStorage.getItem('dotera_saved_recipes') || '{}');
+        delete localRecipes[name];
+        localStorage.setItem('dotera_saved_recipes', JSON.stringify(localRecipes));
+        showToast('trash-2', 'rose-500', `"${name}" 레시피를 삭제했습니다.`);
+        renderSavedRecipesList();
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    // 저장된 목록 그리기
+    function renderSavedRecipesList() {
+      const container = document.getElementById('savedRecipesList');
+      container.innerHTML = '';
+      
+      try {
+        const localRecipes = JSON.parse(localStorage.getItem('dotera_saved_recipes') || '{}');
+        const keys = Object.keys(localRecipes);
+
+        if (keys.length === 0) {
+          container.innerHTML = `<p class="text-xs text-slate-400 text-center py-4 font-semibold">저장된 레시피가 없습니다. 위 입력창에 이름을 적어 저장해보세요.</p>`;
+          return;
+        }
+
+        keys.forEach(key => {
+          const item = localRecipes[key];
+          const dateStr = new Date(item.savedAt).toLocaleDateString();
+          const itemsCount = item.items ? item.items.length : 0;
+
+          const rowHtml = `
+            <div onclick="loadSavedRecipe('${key}')" class="flex items-center justify-between p-3 bg-slate-50 hover:bg-violet-50/50 border border-slate-100 hover:border-violet-100 rounded-xl cursor-pointer transition-all group">
+              <div class="min-w-0">
+                <p class="font-bold text-slate-700 text-xs sm:text-sm truncate">${key}</p>
+                <p class="text-[10px] text-slate-400 font-medium mt-0.5">오일 ${itemsCount}종류 | 저장일: ${dateStr}</p>
+              </div>
+              <div class="flex items-center gap-1">
+                <span class="text-[10px] font-bold text-violet-600 bg-violet-50 px-2 py-0.5 rounded group-hover:bg-violet-100">불러오기</span>
+                <button onclick="deleteSavedRecipe('${key}', event)" class="p-1 hover:bg-rose-50 rounded-lg text-slate-300 hover:text-rose-500 transition-all">
+                  <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                </button>
+              </div>
+            </div>
+          `;
+          container.insertAdjacentHTML('beforeend', rowHtml);
+        });
+        
+        lucide.createIcons();
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    // 12. 알림 토스트 팝업 제어
+    let toastTimeout = null;
+    function showToast(icon, color, msg) {
+      const toast = document.getElementById('toast');
+      const toastIcon = document.getElementById('toastIcon');
+      const toastMessage = document.getElementById('toastMessage');
+
+      // 기존 타이머 클리어
+      if (toastTimeout) clearTimeout(toastTimeout);
+
+      toastMessage.innerText = msg;
+      
+      // 아이콘 동적 갱신
+      toastIcon.setAttribute('data-lucide', icon);
+      toastIcon.className = `w-5 h-5 text-${color}`;
+      lucide.createIcons();
+
+      // 위로 올려서 나타나게 설정
+      toast.className = `fixed bottom-5 right-5 z-50 bg-slate-950 text-white px-5 py-3.5 rounded-2xl shadow-2xl flex items-center gap-3 transform translate-y-0 opacity-100 transition-all duration-300 border border-slate-800`;
+
+      toastTimeout = setTimeout(() => {
+        toast.className = `fixed bottom-5 right-5 z-50 bg-slate-950 text-white px-5 py-3.5 rounded-2xl shadow-2xl flex items-center gap-3 transform translate-y-20 opacity-0 transition-all duration-300 border border-slate-800`;
+      }, 3500);
+    }
+
+    // 13. 프린트 모드 진입
+    function printRecipe() {
+      window.print();
+    }
+  </script>
+</body>
+</html>
