@@ -1,0 +1,754 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>도테라 오일 단가 계산기</title>
+  <style>
+    :root {
+      --navy:#1B2E5E; --green:#3CB371; --orange:#F4A01C;
+      --bg:#F6F8FC; --line:#DDE3EE; --text:#1F2937;
+    }
+    * { box-sizing:border-box; }
+    body { margin:0; font-family:"Pretendard","Apple SD Gothic Neo","Noto Sans KR",Arial,sans-serif; background:var(--bg); color:var(--text); }
+    .wrap { max-width:1120px; margin:0 auto; padding:28px 16px 60px; }
+    header { background:linear-gradient(135deg,var(--navy),#263f80); color:white; border-radius:22px; padding:28px; margin-bottom:20px; box-shadow:0 12px 28px rgba(27,46,94,.18); }
+    h1 { margin:0 0 8px; font-size:30px; letter-spacing:-.04em; }
+    header p { margin:0; opacity:.9; line-height:1.6; }
+    .panel { background:white; border:1px solid var(--line); border-radius:18px; padding:18px; margin-bottom:16px; box-shadow:0 6px 18px rgba(15,23,42,.06); }
+    .top-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:12px; }
+    .card { border:1px solid var(--line); border-radius:16px; padding:16px; background:#fff; }
+    .card small { display:block; color:#6B7280; margin-bottom:6px; }
+    .value { font-size:25px; font-weight:800; color:var(--navy); }
+    .toolbar { display:flex; flex-wrap:wrap; gap:8px; justify-content:space-between; align-items:center; margin-bottom:12px; }
+    button { border:0; border-radius:12px; padding:11px 14px; font-weight:700; cursor:pointer; background:var(--navy); color:white; }
+    button.secondary { background:var(--green); }
+    button.ghost { background:white; color:var(--navy); border:1px solid var(--line); }
+    button.danger { background:#EF4444; padding:8px 10px; }
+    table { width:100%; border-collapse:collapse; }
+    th,td { border-bottom:1px solid var(--line); padding:10px 8px; text-align:right; vertical-align:middle; }
+    th { background:#F3F6FB; color:var(--navy); font-size:14px; }
+    th:first-child,td:first-child, th:nth-child(2), td:nth-child(2) { text-align:left; }
+    select,input { width:100%; border:1px solid var(--line); border-radius:10px; padding:10px; font-size:15px; background:white; }
+    input[type=number] { text-align:right; }
+    .note { font-size:13px; color:#6B7280; line-height:1.6; margin-top:10px; }
+    .pill { display:inline-block; background:#FFF4DF; color:#9A5B00; border-radius:999px; padding:5px 10px; font-size:13px; font-weight:700; }
+    .source { font-size:13px; color:#6B7280; line-height:1.8; column-count:2; column-gap:28px; }
+    .controls { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px; }
+    @media (max-width:760px) {
+      .top-grid { grid-template-columns:1fr 1fr; }
+      .controls { grid-template-columns:1fr; }
+      .source { column-count:1; }
+      table { font-size:13px; }
+      th,td { padding:8px 5px; }
+      h1 { font-size:24px; }
+      .hide-mobile { display:none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>도테라 오일 단가 계산기</h1>
+      <p>회원가 기준으로 1병을 200방울로 보고, 오일별 방울당 단가와 레시피 총 원가를 계산합니다.</p>
+    </header>
+
+    <section class="panel">
+      <div class="top-grid">
+        <div class="card"><small>총 사용 방울 수</small><div class="value" id="totalDrops">0방울</div></div>
+        <div class="card"><small>오일 총 원가</small><div class="value" id="totalCost">0원</div></div>
+        <div class="card"><small>평균 방울 단가</small><div class="value" id="avgCost">0원</div></div>
+        <div class="card"><small>등록 오일 수</small><div class="value" id="oilCount">0개</div></div>
+      </div>
+
+      <div class="toolbar">
+        <span class="pill">1병 = 200방울 기준</span>
+        <div>
+          <button class="secondary" onclick="addRow()">+ 오일 추가</button>
+          <button class="ghost" onclick="loadSample()">예시 불러오기</button>
+          <button class="ghost" onclick="clearRows()">초기화</button>
+        </div>
+      </div>
+
+      <div style="overflow-x:auto;">
+        <table>
+          <thead>
+            <tr>
+              <th style="min-width:160px;">분류</th>
+              <th style="min-width:210px;">오일 선택</th>
+              <th>용량</th>
+              <th>회원가</th>
+              <th>방울당 단가</th>
+              <th style="min-width:95px;">사용 방울</th>
+              <th>소계</th>
+              <th class="hide-mobile">삭제</th>
+            </tr>
+          </thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+      <p class="note">
+        ※ 가격은 공식 가격표 기준으로 입력했습니다. 실제 도테라 회원가는 시기별로 바뀔 수 있으니, 바뀌면 HTML 파일 안의 <b>oilData</b> 숫자만 수정하세요.
+        ※ 5ml, 10ml, 15ml 모두 사용자가 요청한 기준대로 “1병 = 200방울”로 계산합니다.
+      </p>
+    </section>
+
+    <section class="panel">
+      <h2 style="margin-top:0;color:var(--navy);">등록된 오일 가격표</h2>
+      <div class="controls">
+        <input id="searchBox" placeholder="오일명 검색 예: 라벤더, 이지에어, 터치" oninput="renderPriceList()" />
+        <select id="categoryFilter" onchange="renderPriceList()"></select>
+      </div>
+      <div id="priceList" class="source"></div>
+    </section>
+  </div>
+
+  <script>
+    const dropsPerBottle = 200;
+
+    const oilData = [
+      {
+            "category": "단일 에센셜 오일",
+            "name": "프랑킨센스",
+            "volume": "15ml",
+            "memberPrice": 104000
+      },
+      {
+            "category": "단일 에센셜 오일",
+            "name": "라벤더",
+            "volume": "15ml",
+            "memberPrice": 35000
+      },
+      {
+            "category": "단일 에센셜 오일",
+            "name": "레몬",
+            "volume": "15ml",
+            "memberPrice": 16000
+      },
+      {
+            "category": "단일 에센셜 오일",
+            "name": "티트리",
+            "volume": "15ml",
+            "memberPrice": 32000
+      },
+      {
+            "category": "단일 에센셜 오일",
+            "name": "오렌지",
+            "volume": "15ml",
+            "memberPrice": 16000
+      },
+      {
+            "category": "단일 에센셜 오일",
+            "name": "오레가노",
+            "volume": "15ml",
+            "memberPrice": 35000
+      },
+      {
+            "category": "단일 에센셜 오일",
+            "name": "페퍼민트",
+            "volume": "15ml",
+            "memberPrice": 34000
+      },
+      {
+            "category": "단일 에센셜 오일",
+            "name": "진저",
+            "volume": "15ml",
+            "memberPrice": 65000
+      },
+      {
+            "category": "단일 에센셜 오일",
+            "name": "아버비테",
+            "volume": "5ml",
+            "memberPrice": 32000
+      },
+      {
+            "category": "단일 에센셜 오일",
+            "name": "레몬그라스",
+            "volume": "15ml",
+            "memberPrice": 17000
+      },
+      {
+            "category": "단일 에센셜 오일",
+            "name": "자몽",
+            "volume": "15ml",
+            "memberPrice": 27000
+      },
+      {
+            "category": "단일 에센셜 오일",
+            "name": "로즈제라늄",
+            "volume": "15ml",
+            "memberPrice": 49000
+      },
+      {
+            "category": "단일 에센셜 오일",
+            "name": "일랑일랑",
+            "volume": "15ml",
+            "memberPrice": 57000
+      },
+      {
+            "category": "단일 에센셜 오일",
+            "name": "로즈마리",
+            "volume": "15ml",
+            "memberPrice": 26000
+      },
+      {
+            "category": "단일 에센셜 오일",
+            "name": "베티버",
+            "volume": "15ml",
+            "memberPrice": 65000
+      },
+      {
+            "category": "단일 에센셜 오일",
+            "name": "사이프레스",
+            "volume": "15ml",
+            "memberPrice": 25000
+      },
+      {
+            "category": "단일 에센셜 오일",
+            "name": "시더우드",
+            "volume": "15ml",
+            "memberPrice": 20000
+      },
+      {
+            "category": "단일 에센셜 오일",
+            "name": "유칼립투스",
+            "volume": "15ml",
+            "memberPrice": 28000
+      },
+      {
+            "category": "단일 에센셜 오일",
+            "name": "미르",
+            "volume": "15ml",
+            "memberPrice": 91000
+      },
+      {
+            "category": "단일 에센셜 오일",
+            "name": "마조람",
+            "volume": "15ml",
+            "memberPrice": 31000
+      },
+      {
+            "category": "단일 에센셜 오일",
+            "name": "멜리사",
+            "volume": "5ml",
+            "memberPrice": 138000
+      },
+      {
+            "category": "단일 에센셜 오일",
+            "name": "주니퍼 베리",
+            "volume": "5ml",
+            "memberPrice": 28000
+      },
+      {
+            "category": "단일 에센셜 오일",
+            "name": "로만 캐모마일",
+            "volume": "5ml",
+            "memberPrice": 65000
+      },
+      {
+            "category": "단일 에센셜 오일",
+            "name": "블랙페퍼",
+            "volume": "5ml",
+            "memberPrice": 32000
+      },
+      {
+            "category": "단일 에센셜 오일",
+            "name": "스피어민트",
+            "volume": "15ml",
+            "memberPrice": 42000
+      },
+      {
+            "category": "단일 에센셜 오일",
+            "name": "라임",
+            "volume": "15ml",
+            "memberPrice": 20000
+      },
+      {
+            "category": "단일 에센셜 오일",
+            "name": "클로브",
+            "volume": "15ml",
+            "memberPrice": 25000
+      },
+      {
+            "category": "단일 에센셜 오일",
+            "name": "하와이안 샌달우드",
+            "volume": "5ml",
+            "memberPrice": 102000
+      },
+      {
+            "category": "단일 에센셜 오일",
+            "name": "헬리크리섬",
+            "volume": "5ml",
+            "memberPrice": 107000
+      },
+      {
+            "category": "단일 에센셜 오일",
+            "name": "히노키",
+            "volume": "5ml",
+            "memberPrice": 37000
+      },
+      {
+            "category": "단일 에센셜 오일",
+            "name": "발삼 코파이바",
+            "volume": "15ml",
+            "memberPrice": 54000
+      },
+      {
+            "category": "단일 에센셜 오일",
+            "name": "시나몬 바크",
+            "volume": "5ml",
+            "memberPrice": 38000
+      },
+      {
+            "category": "단일 에센셜 오일",
+            "name": "클래리 세이지",
+            "volume": "15ml",
+            "memberPrice": 56000
+      },
+      {
+            "category": "단일 에센셜 오일",
+            "name": "시베리안 퍼",
+            "volume": "15ml",
+            "memberPrice": 31000
+      },
+      {
+            "category": "단일 에센셜 오일",
+            "name": "파촐리",
+            "volume": "15ml",
+            "memberPrice": 48000
+      },
+      {
+            "category": "단일 에센셜 오일",
+            "name": "윈터그린",
+            "volume": "15ml",
+            "memberPrice": 30000
+      },
+      {
+            "category": "단일 에센셜 오일",
+            "name": "투메릭",
+            "volume": "15ml",
+            "memberPrice": 45000
+      },
+      {
+            "category": "단일 에센셜 오일",
+            "name": "베르가못",
+            "volume": "15ml",
+            "memberPrice": 45000
+      },
+      {
+            "category": "단일 에센셜 오일",
+            "name": "바질",
+            "volume": "15ml",
+            "memberPrice": 33000
+      },
+      {
+            "category": "단일 에센셜 오일",
+            "name": "그린만다린",
+            "volume": "15ml",
+            "memberPrice": 44000
+      },
+      {
+            "category": "단일 에센셜 오일",
+            "name": "로즈페탈",
+            "volume": "5ml",
+            "memberPrice": 399000
+      },
+      {
+            "category": "단일 에센셜 오일",
+            "name": "레몬 유칼립투스",
+            "volume": "15ml",
+            "memberPrice": 19000
+      },
+      {
+            "category": "블렌드 오일",
+            "name": "패스트탠스",
+            "volume": "15ml",
+            "memberPrice": 44000
+      },
+      {
+            "category": "블렌드 오일",
+            "name": "다이제스트젠",
+            "volume": "15ml",
+            "memberPrice": 48000
+      },
+      {
+            "category": "블렌드 오일",
+            "name": "온가드",
+            "volume": "15ml",
+            "memberPrice": 49000
+      },
+      {
+            "category": "블렌드 오일",
+            "name": "젠도크린",
+            "volume": "15ml",
+            "memberPrice": 38000
+      },
+      {
+            "category": "블렌드 오일",
+            "name": "스마트앤새시",
+            "volume": "15ml",
+            "memberPrice": 38000
+      },
+      {
+            "category": "블렌드 오일",
+            "name": "이지에어",
+            "volume": "15ml",
+            "memberPrice": 34000
+      },
+      {
+            "category": "블렌드 오일",
+            "name": "아로마터치",
+            "volume": "15ml",
+            "memberPrice": 44000
+      },
+      {
+            "category": "블렌드 오일",
+            "name": "퓨리파이",
+            "volume": "15ml",
+            "memberPrice": 32000
+      },
+      {
+            "category": "블렌드 오일",
+            "name": "세레니티",
+            "volume": "15ml",
+            "memberPrice": 49000
+      },
+      {
+            "category": "블렌드 오일",
+            "name": "시트러스 블리스",
+            "volume": "15ml",
+            "memberPrice": 28000
+      },
+      {
+            "category": "블렌드 오일",
+            "name": "밸런스",
+            "volume": "15ml",
+            "memberPrice": 30000
+      },
+      {
+            "category": "블렌드 오일",
+            "name": "테라쉴드",
+            "volume": "15ml",
+            "memberPrice": 15000
+      },
+      {
+            "category": "블렌드 오일",
+            "name": "딥블루",
+            "volume": "5ml",
+            "memberPrice": 51000
+      },
+      {
+            "category": "블렌드 오일",
+            "name": "클리어리파이",
+            "volume": "15ml",
+            "memberPrice": 44000
+      },
+      {
+            "category": "블렌드 오일",
+            "name": "타임",
+            "volume": "15ml",
+            "memberPrice": 46000
+      },
+      {
+            "category": "블렌드 오일",
+            "name": "야로우 폼",
+            "volume": "30ml",
+            "memberPrice": 138000
+      },
+      {
+            "category": "블렌드 오일",
+            "name": "어댑티브",
+            "volume": "15ml",
+            "memberPrice": 58000
+      },
+      {
+            "category": "블렌드 오일",
+            "name": "블랙 스프루스",
+            "volume": "15ml",
+            "memberPrice": 29000
+      },
+      {
+            "category": "블렌드 오일",
+            "name": "샐러리 씨드",
+            "volume": "15ml",
+            "memberPrice": 52000
+      },
+      {
+            "category": "롤온/터치 오일",
+            "name": "로즈터치",
+            "volume": "10ml",
+            "memberPrice": 102000
+      },
+      {
+            "category": "롤온/터치 오일",
+            "name": "네롤리터치",
+            "volume": "10ml",
+            "memberPrice": 71000
+      },
+      {
+            "category": "롤온/터치 오일",
+            "name": "자스민 터치",
+            "volume": "10ml",
+            "memberPrice": 61000
+      },
+      {
+            "category": "롤온/터치 오일",
+            "name": "호프 터치",
+            "volume": "10ml",
+            "memberPrice": 23000
+      },
+      {
+            "category": "롤온/터치 오일",
+            "name": "살루벨",
+            "volume": "10ml",
+            "memberPrice": 105000
+      },
+      {
+            "category": "롤온/터치 오일",
+            "name": "인툰",
+            "volume": "10ml",
+            "memberPrice": 53000
+      },
+      {
+            "category": "롤온/터치 오일",
+            "name": "클래리캄",
+            "volume": "10ml",
+            "memberPrice": 39000
+      },
+      {
+            "category": "롤온/터치 오일",
+            "name": "라벤더 터치",
+            "volume": "10ml",
+            "memberPrice": 23000
+      },
+      {
+            "category": "롤온/터치 오일",
+            "name": "페퍼민트 터치",
+            "volume": "10ml",
+            "memberPrice": 23000
+      },
+      {
+            "category": "롤온/터치 오일",
+            "name": "프랑킨센스 터치",
+            "volume": "10ml",
+            "memberPrice": 69000
+      },
+      {
+            "category": "롤온/터치 오일",
+            "name": "티트리 터치",
+            "volume": "10ml",
+            "memberPrice": 21000
+      },
+      {
+            "category": "롤온/터치 오일",
+            "name": "다이제스트젠 터치",
+            "volume": "10ml",
+            "memberPrice": 32000
+      },
+      {
+            "category": "롤온/터치 오일",
+            "name": "이지에어 터치",
+            "volume": "10ml",
+            "memberPrice": 23000
+      },
+      {
+            "category": "롤온/터치 오일",
+            "name": "온가드 터치",
+            "volume": "10ml",
+            "memberPrice": 33000
+      },
+      {
+            "category": "롤온/터치 오일",
+            "name": "오레가노 터치",
+            "volume": "10ml",
+            "memberPrice": 27000
+      },
+      {
+            "category": "롤온/터치 오일",
+            "name": "매그놀리아 터치",
+            "volume": "10ml",
+            "memberPrice": 42000
+      },
+      {
+            "category": "롤온/터치 오일",
+            "name": "아마비 터치",
+            "volume": "10ml",
+            "memberPrice": 26000
+      },
+      {
+            "category": "롤온/터치 오일",
+            "name": "위스퍼 터치",
+            "volume": "10ml",
+            "memberPrice": 38000
+      },
+      {
+            "category": "요가 블렌드 오일",
+            "name": "얼라인",
+            "volume": "5ml",
+            "memberPrice": 27000
+      },
+      {
+            "category": "요가 블렌드 오일",
+            "name": "어센드",
+            "volume": "5ml",
+            "memberPrice": 27000
+      },
+      {
+            "category": "요가 블렌드 오일",
+            "name": "앵커",
+            "volume": "5ml",
+            "memberPrice": 29000
+      },
+      {
+            "category": "이모셔널 아로마테라피",
+            "name": "치어",
+            "volume": "5ml",
+            "memberPrice": 36000
+      },
+      {
+            "category": "이모셔널 아로마테라피",
+            "name": "콘솔",
+            "volume": "5ml",
+            "memberPrice": 57000
+      },
+      {
+            "category": "이모셔널 아로마테라피",
+            "name": "포기브",
+            "volume": "5ml",
+            "memberPrice": 32000
+      },
+      {
+            "category": "이모셔널 아로마테라피",
+            "name": "모티베이트",
+            "volume": "5ml",
+            "memberPrice": 33000
+      },
+      {
+            "category": "이모셔널 아로마테라피",
+            "name": "패션",
+            "volume": "5ml",
+            "memberPrice": 61000
+      },
+      {
+            "category": "이모셔널 아로마테라피",
+            "name": "피스 필",
+            "volume": "5ml",
+            "memberPrice": 47000
+      },
+      {
+            "category": "키즈 컬렉션",
+            "name": "씽커",
+            "volume": "10ml",
+            "memberPrice": 25000
+      },
+      {
+            "category": "키즈 컬렉션",
+            "name": "카머",
+            "volume": "10ml",
+            "memberPrice": 29000
+      },
+      {
+            "category": "키즈 컬렉션",
+            "name": "스트롱거",
+            "volume": "10ml",
+            "memberPrice": 23000
+      },
+      {
+            "category": "키즈 컬렉션",
+            "name": "레스큐어",
+            "volume": "10ml",
+            "memberPrice": 24000
+      },
+      {
+            "category": "키즈 컬렉션",
+            "name": "스테디",
+            "volume": "10ml",
+            "memberPrice": 24000
+      },
+      {
+            "category": "키즈 컬렉션",
+            "name": "브레이브",
+            "volume": "10ml",
+            "memberPrice": 31000
+      },
+      {
+            "category": "캐리어/기타 오일",
+            "name": "코코넛오일",
+            "volume": "115ml",
+            "memberPrice": 17000
+      },
+      {
+            "category": "캐리어/기타 오일",
+            "name": "hdclear 토피컬 블렌드",
+            "volume": "10ml",
+            "memberPrice": 30000
+      }
+];
+
+    const sampleRecipe = [
+      ["이지에어", 20], ["티트리", 10], ["페퍼민트", 5], ["유칼립투스", 5],
+      ["오레가노", 3], ["클리어리파이", 10], ["프랑킨센스", 2], ["발삼 코파이바", 5]
+    ];
+
+    function won(n) { return Math.round(n).toLocaleString("ko-KR") + "원"; }
+    function getOil(name) { return oilData.find(o => o.name === name) || oilData[0]; }
+    function makeOptions(selectedName) {
+      return oilData.map(o => `<option value="${o.name}" ${o.name===selectedName?"selected":""}>${o.name}</option>`).join("");
+    }
+    function addRow(selectedName = oilData[0].name, drops = 1) {
+      const tbody = document.getElementById("rows");
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td class="category"></td>
+        <td><select onchange="updateAll()">${makeOptions(selectedName)}</select></td>
+        <td class="volume"></td>
+        <td class="price"></td>
+        <td class="dropPrice"></td>
+        <td><input type="number" min="0" step="1" value="${drops}" oninput="updateAll()"></td>
+        <td class="subtotal"></td>
+        <td class="hide-mobile"><button class="danger" onclick="this.closest('tr').remove(); updateAll();">삭제</button></td>
+      `;
+      tbody.appendChild(tr);
+      updateAll();
+    }
+    function updateAll() {
+      let totalDrops = 0, totalCost = 0;
+      document.querySelectorAll("#rows tr").forEach(tr => {
+        const name = tr.querySelector("select").value;
+        const drops = Number(tr.querySelector("input").value || 0);
+        const oil = getOil(name);
+        const dropPrice = oil.memberPrice / dropsPerBottle;
+        const subtotal = dropPrice * drops;
+        tr.querySelector(".category").textContent = oil.category;
+        tr.querySelector(".volume").textContent = oil.volume;
+        tr.querySelector(".price").textContent = won(oil.memberPrice);
+        tr.querySelector(".dropPrice").textContent = won(dropPrice);
+        tr.querySelector(".subtotal").textContent = won(subtotal);
+        totalDrops += drops; totalCost += subtotal;
+      });
+      document.getElementById("totalDrops").textContent = totalDrops.toLocaleString("ko-KR") + "방울";
+      document.getElementById("totalCost").textContent = won(totalCost);
+      document.getElementById("avgCost").textContent = totalDrops ? won(totalCost / totalDrops) : "0원";
+      document.getElementById("oilCount").textContent = oilData.length + "개";
+    }
+    function clearRows() { document.getElementById("rows").innerHTML = ""; updateAll(); }
+    function loadSample() { clearRows(); sampleRecipe.forEach(([name,drops]) => addRow(name,drops)); }
+    function initCategoryFilter() {
+      const cats = ["전체", ...new Set(oilData.map(o => o.category))];
+      document.getElementById("categoryFilter").innerHTML = cats.map(c => `<option value="${c}">${c}</option>`).join("");
+    }
+    function renderPriceList() {
+      const q = document.getElementById("searchBox").value.trim().toLowerCase();
+      const cat = document.getElementById("categoryFilter").value || "전체";
+      const filtered = oilData.filter(o => (cat==="전체" || o.category===cat) && (!q || o.name.toLowerCase().includes(q)));
+      document.getElementById("priceList").innerHTML = filtered.map(o => {
+        const dropPrice = o.memberPrice / dropsPerBottle;
+        return `· [${o.category}] ${o.name} (${o.volume}) — 회원가 ${won(o.memberPrice)}, 방울당 ${won(dropPrice)}`;
+      }).join("<br>") || "검색 결과가 없습니다.";
+    }
+    initCategoryFilter();
+    renderPriceList();
+    loadSample();
+  </script>
+</body>
+</html>
