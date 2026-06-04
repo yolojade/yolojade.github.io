@@ -301,10 +301,11 @@
                 class="flex flex-wrap gap-2 w-full sm:w-auto justify-end no-print"
               >
                 <button
-                  onclick="document.getElementById('recommendedRecipePanel').scrollIntoView({ behavior: 'smooth', block: 'start' })"
+                  onclick="toggleRecommendedRecipes()"
                   class="flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs sm:text-sm px-3.5 py-2 rounded-xl transition-all"
                 >
-                  <i data-lucide="sparkles" class="w-4 h-4"></i> 추천 레시피
+                  <i data-lucide="sparkles" class="w-4 h-4"></i>
+                  <span id="recommendedRecipeToggleLabel">추천 레시피</span>
                 </button>
                 <button
                   onclick="clearRecipe()"
@@ -317,7 +318,7 @@
 
             <div
               id="recommendedRecipePanel"
-              class="no-print bg-slate-50 border border-slate-100 rounded-2xl p-4 mb-5"
+              class="hidden no-print bg-slate-50 border border-slate-100 rounded-2xl p-4 mb-5"
             >
               <div
                 class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3"
@@ -841,10 +842,11 @@
       ];
 
       // 2. 전역 애플리케이션 상태(State) 관리
-      let state = {
+              let state = {
         recipeItems: [], // 현재 레시피 테이블에 올라간 아이템 목록
         currentCategory: "all", // 검색 필터링용 탭
         searchQuery: "", // 검색 키워드
+        showRecommendedRecipes: false,
       };
 
       // 3. 라이프사이클 이닛
@@ -986,6 +988,26 @@
           `;
           container.insertAdjacentHTML("beforeend", cardHtml);
         });
+      }
+
+      function toggleRecommendedRecipes() {
+        state.showRecommendedRecipes = !state.showRecommendedRecipes;
+
+        const panel = document.getElementById("recommendedRecipePanel");
+        const label = document.getElementById("recommendedRecipeToggleLabel");
+        if (!panel) return;
+
+        panel.classList.toggle("hidden", !state.showRecommendedRecipes);
+        if (label) {
+          label.innerText = state.showRecommendedRecipes
+            ? "추천 레시피 닫기"
+            : "추천 레시피";
+        }
+
+        if (state.showRecommendedRecipes) {
+          renderRecommendedRecipes();
+          panel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        }
       }
 
       function applyRecommendedRecipe(recipeId, mode = "replace") {
