@@ -862,11 +862,8 @@
 
         if (encodedRecipe) {
           try {
-            const decodedData = JSON.parse(
-              decodeURIComponent(escape(atob(encodedRecipe))),
-            );
-            if (decodedData && Array.isArray(decodedData.items)) {
-              state.recipeItems = decodedData.items;
+            const decodedData = decodeRecipePayload(encodedRecipe);
+            if (loadSharedRecipe(decodedData)) {
               if (decodedData.baseDrops) {
                 document.getElementById("base15mlDrops").value =
                   decodedData.baseDrops;
@@ -904,6 +901,43 @@
 
         // 4) 레시피 상태 계산 및 렌더링
         calculateAndRender();
+      }
+
+      function makeRecipeItemId() {
+        return Date.now() + Math.random().toString(36).substr(2, 5);
+      }
+
+      function encodeRecipePayload(payload) {
+        const jsonStr = JSON.stringify(payload);
+        const base64 = btoa(unescape(encodeURIComponent(jsonStr)));
+        return base64
+          .replace(/\+/g, "-")
+          .replace(/\//g, "_")
+          .replace(/=+$/g, "");
+      }
+
+      function decodeRecipePayload(encodedRecipe) {
+        const legacySafeRecipe = encodedRecipe.replace(/ /g, "+");
+        let base64 = legacySafeRecipe.replace(/-/g, "+").replace(/_/g, "/");
+        base64 = base64.padEnd(base64.length + ((4 - (base64.length % 4)) % 4), "=");
+
+        return JSON.parse(decodeURIComponent(escape(atob(base64))));
+      }
+
+      function loadSharedRecipe(decodedData) {
+        if (!decodedData || !Array.isArray(decodedData.items)) return false;
+
+        state.recipeItems = decodedData.items.map((item) => ({
+          id: item.id || makeRecipeItemId(),
+          name: item.name || "이름 없는 오일",
+          volume: parseFloat(item.volume) || 15,
+          memberPrice: parseInt(item.memberPrice) || 0,
+          dropsPerBottle: parseInt(item.dropsPerBottle) || 1,
+          recipeDrops: parseInt(item.recipeDrops) || 0,
+          category: item.category || "사용자정의",
+        }));
+
+        return true;
       }
 
       // 4. 레시피 아이템 추가/수정 함수
@@ -1036,7 +1070,7 @@
         const dropsPerBottle = calculateDropsForVolume(volume, baseDrops);
 
         const newItem = {
-          id: Date.now() + Math.random().toString(36).substr(2, 5),
+          id: makeRecipeItemId(),
           name: name,
           volume: volume,
           memberPrice: memberPrice,
@@ -1054,7 +1088,7 @@
       function addCustomRow() {
         const baseDrops = getBaseDrops();
         const newItem = {
-          id: Date.now() + Math.random().toString(36).substr(2, 5),
+          id: makeRecipeItemId(),
           name: "커스텀 오일/공병",
           volume: 15,
           memberPrice: 10000,
@@ -1368,7 +1402,7 @@
       }
 
       // 10. 레시피 카카오톡 / SNS 공유를 위한 링크 생성 (Base64 인코딩)
-      function shareRecipeLink() {
+      async function shareRecipeLink() {
         if (state.recipeItems.length === 0) {
           showToast(
             "alert-circle",
@@ -1392,17 +1426,28 @@
             })),
           };
 
-          // 한글 깨짐 방지용 유니코드 우회 base64 인코딩
-          const jsonStr = JSON.stringify(recipePayload);
-          const base64Encoded = btoa(unescape(encodeURIComponent(jsonStr)));
+          // URL에서 깨지지 않도록 URL-safe base64로 인코딩
+          const base64Encoded = encodeRecipePayload(recipePayload);
           const shareUrl = `${window.location.origin}${window.location.pathname}?recipe=${base64Encoded}`;
 
-          // 클립보드 복사 유틸리티 호출 (iframe 이슈 완벽 보안 처리)
-          copyToClipboard(shareUrl);
+          const shareTitle =
+            document.getElementById("recipeNameInput").value ||
+            "도테라 오일 레시피";
+
+          if (navigator.share) {
+            await navigator.share({
+              title: shareTitle,
+              text: `${shareTitle} 레시피를 공유합니다.`,
+              url: shareUrl,
+            });
+          } else {
+            await copyToClipboard(shareUrl);
+          }
+
           showToast(
             "share-2",
             "indigo-500",
-            "공유 링크가 클립보드에 복사되었습니다! 카톡에 붙여넣기 하세요.",
+            "공유 링크가 준비되었습니다. 받은 사람이 열면 레시피가 그대로 불러와집니다.",
           );
         } catch (e) {
           console.error(e);
@@ -1415,15 +1460,24 @@
       }
 
       // Clipboard Copy 보안 우회 유틸리티
-      function copyToClipboard(text) {
+      async function copyToClipboard(text) {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(text);
+          return;
+        }
+
         const tempInput = document.createElement("input");
         tempInput.style.position = "absolute";
         tempInput.style.left = "-9999px";
         tempInput.value = text;
         document.body.appendChild(tempInput);
         tempInput.select();
-        document.execCommand("copy");
+        const copied = document.execCommand("copy");
         document.body.removeChild(tempInput);
+
+        if (!copied) {
+          throw new Error("클립보드 복사에 실패했습니다.");
+        }
       }
 
       // 11. 로컬 저장소 브라우저 저장 기능
