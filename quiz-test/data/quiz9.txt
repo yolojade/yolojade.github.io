@@ -1,0 +1,214 @@
+1
+for i in range(10):
+    if i > 6:
+        print(i)
+===
+7
+8
+9
+
+2
+for i in range(2,10,3):
+    if i == 5:
+        print(i+i)
+===
+10
+
+3
+for i in range(10,0,-1):
+    if i < 4:
+        print(i, end=" ")
+===
+3 2 1
+
+4
+for i in range(10):
+    if i < 3:
+        print(i)
+===
+0
+1
+2
+
+5
+a = 4
+for i in range(10):
+    if i == a:
+        print(i+a)
+===
+8
+
+6
+a = 10
+for i in range(15,0,-5):
+    if i < a:
+        print(i)
+===
+5
+
+7
+a = 0
+n = 10
+for i in range(1,10,2):
+    if 5 <= i < n:
+        a = a + i
+        print(a, end=" ")
+===
+5 12 21
+
+8
+for i in range(3):
+    if i < 2:
+        print("A")
+    else:
+        print("B")
+===
+A
+A
+B
+
+9
+for i in range(1,7,2):
+    if i > 4:
+        print("A")
+    else:
+        print("B")
+===
+B
+B
+A
+
+10
+a = 0
+for i in range(10,4,-1):
+    if i % 2 == 0:
+        a = i
+        print(a)
+===
+10
+8
+6
+
+11
+sum = 0
+for i in range(1,10,2):
+    if i % 3 == 0:
+        print(i)
+        sum = sum + i
+print(sum)
+===
+3
+9
+12
+
+12
+a = [5,6,7,8,9]
+for i in a:
+    if i >= 7:
+        print(i)
+===
+7
+8
+9
+
+13
+a = [1,2,3,4,5,6,7,8,9]
+for i in a:
+    if i % 2 == 0:
+        print(i)
+===
+2
+4
+6
+8
+
+14
+list1 = [18,77,68,54,99,15]
+for i in list1:
+    if i < 55:
+        print(i)
+===
+18
+54
+15
+
+15
+a = 0
+while 1:
+    a += 1
+    if a > 3:
+        break
+print(a)
+===
+4
+
+16
+a = 1
+while 1:
+    if a < 10:
+        a *= 2
+    else:
+        break
+print(a)
+===
+16
+
+17
+s = 100
+while True:
+    if s < 10:
+        break
+    s = s - 20
+    print(s, end=" ")
+===
+80 60 40 20 0
+
+18
+n = 1
+c = 'v'
+while True:
+    print(c*n, end=" ")
+    n += 1
+    if n == 3:
+        break
+print(c*n)
+===
+v vv vvv
+
+19
+a = 5
+b = 20
+while 1:
+    if a+b > 10:
+        a -= 4
+        b += 1
+    elif a+b < 10:
+        a *= 2
+        b -= 3
+    else:
+        break
+    print(a+b)
+===
+22
+19
+16
+13
+10
+
+20
+a = 20
+b = 80
+c = 0
+while True:
+    if c < 100:
+        if a < b:
+            c += a
+        else:
+            c += b
+    else:
+        break
+    a += 10
+    b -= 15
+print(a, b, c)
+===
+60 20 125

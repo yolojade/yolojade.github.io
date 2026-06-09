@@ -324,8 +324,13 @@
                 class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3"
               >
                 <div>
-                  <h3 class="text-sm font-bold text-slate-800 flex items-center gap-1.5">
-                    <i data-lucide="sparkles" class="w-4 h-4 text-indigo-600"></i>
+                  <h3
+                    class="text-sm font-bold text-slate-800 flex items-center gap-1.5"
+                  >
+                    <i
+                      data-lucide="sparkles"
+                      class="w-4 h-4 text-indigo-600"
+                    ></i>
                     목적별 추천 레시피
                   </h3>
                   <p class="text-xs text-slate-500 mt-0.5">
@@ -346,7 +351,9 @@
                   <tr
                     class="border-b border-slate-200 text-xs font-bold text-slate-400 uppercase tracking-wider bg-slate-50/50 rounded-t-lg"
                   >
-                    <th class="py-3 px-4 rounded-l-lg">분류 / 오일 정보</th>
+                    <th class="py-3 px-3 rounded-l-lg w-[190px]">
+                      분류 / 오일 정보
+                    </th>
                     <th class="py-3 px-2 text-center">용량 (mL)</th>
                     <th class="py-3 px-2 text-right">회원가 (원)</th>
                     <th class="py-3 px-2 text-center">병당 총 방울수</th>
@@ -515,7 +522,9 @@
             </div>
 
             <!-- 카테고리 탭 선택기 -->
-            <div class="flex flex-wrap gap-1 bg-slate-100 p-1 rounded-xl text-xs mb-4">
+            <div
+              class="flex flex-wrap gap-1 bg-slate-100 p-1 rounded-xl text-xs mb-4"
+            >
               <button
                 onclick="setCategoryFilter('all')"
                 id="tab-all"
@@ -629,15 +638,40 @@
       // 1. 도테라 회원가 원본 데이터베이스 (한국 도테라 공식 2026.04.08 가격 안내서 기준)
       const PRESET_OILS = [
         // 싱글 오일 (Single Oils)
-        { name: "그린만다린", volume: 15, memberPrice: 46000, category: "싱글" },
+        {
+          name: "그린만다린",
+          volume: 15,
+          memberPrice: 46000,
+          category: "싱글",
+        },
         { name: "라벤더", volume: 15, memberPrice: 40000, category: "싱글" },
         { name: "라임", volume: 15, memberPrice: 24000, category: "싱글" },
         { name: "레몬", volume: 15, memberPrice: 20000, category: "싱글" },
-        { name: "레몬 유칼립투스", volume: 15, memberPrice: 21000, category: "싱글" },
-        { name: "레몬그라스", volume: 15, memberPrice: 20000, category: "싱글" },
-        { name: "로만 캐모마일", volume: 5, memberPrice: 72000, category: "싱글" },
+        {
+          name: "레몬 유칼립투스",
+          volume: 15,
+          memberPrice: 21000,
+          category: "싱글",
+        },
+        {
+          name: "레몬그라스",
+          volume: 15,
+          memberPrice: 20000,
+          category: "싱글",
+        },
+        {
+          name: "로만 캐모마일",
+          volume: 5,
+          memberPrice: 72000,
+          category: "싱글",
+        },
         { name: "로즈마리", volume: 15, memberPrice: 29000, category: "싱글" },
-        { name: "로즈제라늄", volume: 15, memberPrice: 58000, category: "싱글" },
+        {
+          name: "로즈제라늄",
+          volume: 15,
+          memberPrice: 58000,
+          category: "싱글",
+        },
         { name: "로즈페탈", volume: 5, memberPrice: 450000, category: "싱글" },
         { name: "마조람", volume: 15, memberPrice: 35000, category: "싱글" },
         { name: "멜리사", volume: 5, memberPrice: 146000, category: "싱글" },
@@ -646,117 +680,427 @@
         { name: "베르가못", volume: 15, memberPrice: 54000, category: "싱글" },
         { name: "베티버", volume: 15, memberPrice: 79000, category: "싱글" },
         { name: "블랙페퍼", volume: 5, memberPrice: 35000, category: "싱글" },
-        { name: "사이프레스", volume: 15, memberPrice: 29000, category: "싱글" },
-        { name: "스피어민트", volume: 15, memberPrice: 45000, category: "싱글" },
-        { name: "시나몬 바크", volume: 5, memberPrice: 44000, category: "싱글" },
+        {
+          name: "사이프레스",
+          volume: 15,
+          memberPrice: 29000,
+          category: "싱글",
+        },
+        {
+          name: "스피어민트",
+          volume: 15,
+          memberPrice: 45000,
+          category: "싱글",
+        },
+        {
+          name: "시나몬 바크",
+          volume: 5,
+          memberPrice: 44000,
+          category: "싱글",
+        },
         { name: "시더우드", volume: 15, memberPrice: 24000, category: "싱글" },
-        { name: "시베리안 퍼", volume: 15, memberPrice: 32000, category: "싱글" },
+        {
+          name: "시베리안 퍼",
+          volume: 15,
+          memberPrice: 32000,
+          category: "싱글",
+        },
         { name: "아버비테", volume: 5, memberPrice: 34000, category: "싱글" },
         { name: "오레가노", volume: 15, memberPrice: 41000, category: "싱글" },
         { name: "오렌지", volume: 15, memberPrice: 17000, category: "싱글" },
         { name: "윈터그린", volume: 15, memberPrice: 35000, category: "싱글" },
-        { name: "유칼립투스", volume: 15, memberPrice: 31000, category: "싱글" },
+        {
+          name: "유칼립투스",
+          volume: 15,
+          memberPrice: 31000,
+          category: "싱글",
+        },
         { name: "일랑일랑", volume: 15, memberPrice: 63000, category: "싱글" },
         { name: "자몽", volume: 15, memberPrice: 30000, category: "싱글" },
-        { name: "주니퍼 베리", volume: 5, memberPrice: 32000, category: "싱글" },
+        {
+          name: "주니퍼 베리",
+          volume: 5,
+          memberPrice: 32000,
+          category: "싱글",
+        },
         { name: "진저", volume: 15, memberPrice: 72000, category: "싱글" },
         { name: "코파이바", volume: 15, memberPrice: 58000, category: "싱글" },
-        { name: "클래리 세이지", volume: 15, memberPrice: 59000, category: "싱글" },
+        {
+          name: "클래리 세이지",
+          volume: 15,
+          memberPrice: 59000,
+          category: "싱글",
+        },
         { name: "클로브", volume: 15, memberPrice: 29000, category: "싱글" },
         { name: "타임", volume: 15, memberPrice: 52000, category: "싱글" },
         { name: "투메릭", volume: 15, memberPrice: 46000, category: "싱글" },
         { name: "티트리", volume: 15, memberPrice: 35000, category: "싱글" },
         { name: "파촐리", volume: 15, memberPrice: 49000, category: "싱글" },
         { name: "페퍼민트", volume: 15, memberPrice: 36000, category: "싱글" },
-        { name: "프랑킨센스", volume: 15, memberPrice: 114000, category: "싱글" },
-        { name: "하와이안 샌달우드", volume: 5, memberPrice: 112000, category: "싱글" },
-        { name: "헬리크리섬", volume: 5, memberPrice: 117000, category: "싱글" },
+        {
+          name: "프랑킨센스",
+          volume: 15,
+          memberPrice: 114000,
+          category: "싱글",
+        },
+        {
+          name: "하와이안 샌달우드",
+          volume: 5,
+          memberPrice: 112000,
+          category: "싱글",
+        },
+        {
+          name: "헬리크리섬",
+          volume: 5,
+          memberPrice: 117000,
+          category: "싱글",
+        },
         { name: "히노키", volume: 5, memberPrice: 38000, category: "싱글" },
 
         // 블렌드 오일 (Blend Oils)
-        { name: "테라쉴드", volume: 15, memberPrice: 19000, category: "블렌드" },
-        { name: "다이제스트젠", volume: 15, memberPrice: 54000, category: "블렌드" },
+        {
+          name: "테라쉴드",
+          volume: 15,
+          memberPrice: 19000,
+          category: "블렌드",
+        },
+        {
+          name: "다이제스트젠",
+          volume: 15,
+          memberPrice: 54000,
+          category: "블렌드",
+        },
         { name: "딥블루", volume: 5, memberPrice: 55000, category: "블렌드" },
-        { name: "마다가스카르 바닐라", volume: 5, memberPrice: 55000, category: "블렌드" },
-        { name: "메타파워", volume: 15, memberPrice: 45000, category: "블렌드" },
-        { name: "모티베이트", volume: 5, memberPrice: 35000, category: "블렌드" },
+        {
+          name: "마다가스카르 바닐라",
+          volume: 5,
+          memberPrice: 55000,
+          category: "블렌드",
+        },
+        {
+          name: "메타파워",
+          volume: 15,
+          memberPrice: 45000,
+          category: "블렌드",
+        },
+        {
+          name: "모티베이트",
+          volume: 5,
+          memberPrice: 35000,
+          category: "블렌드",
+        },
         { name: "밸런스", volume: 15, memberPrice: 34000, category: "블렌드" },
-        { name: "세레니티", volume: 15, memberPrice: 56000, category: "블렌드" },
-        { name: "수퍼민트", volume: 15, memberPrice: 49000, category: "블렌드" },
-        { name: "시트러스 블리스", volume: 15, memberPrice: 32000, category: "블렌드" },
-        { name: "아로마터치", volume: 15, memberPrice: 49000, category: "블렌드" },
-        { name: "야로우폼", volume: 30, memberPrice: 156000, category: "블렌드" },
-        { name: "어댑티브", volume: 15, memberPrice: 64000, category: "블렌드" },
-        { name: "엘리베이트 에센스", volume: 15, memberPrice: 69000, category: "블렌드" },
+        {
+          name: "세레니티",
+          volume: 15,
+          memberPrice: 56000,
+          category: "블렌드",
+        },
+        {
+          name: "수퍼민트",
+          volume: 15,
+          memberPrice: 49000,
+          category: "블렌드",
+        },
+        {
+          name: "시트러스 블리스",
+          volume: 15,
+          memberPrice: 32000,
+          category: "블렌드",
+        },
+        {
+          name: "아로마터치",
+          volume: 15,
+          memberPrice: 49000,
+          category: "블렌드",
+        },
+        {
+          name: "야로우폼",
+          volume: 30,
+          memberPrice: 156000,
+          category: "블렌드",
+        },
+        {
+          name: "어댑티브",
+          volume: 15,
+          memberPrice: 64000,
+          category: "블렌드",
+        },
+        {
+          name: "엘리베이트 에센스",
+          volume: 15,
+          memberPrice: 69000,
+          category: "블렌드",
+        },
         { name: "온가드", volume: 15, memberPrice: 52000, category: "블렌드" },
-        { name: "이지에어", volume: 15, memberPrice: 39000, category: "블렌드" },
-        { name: "젠도크린", volume: 15, memberPrice: 42000, category: "블렌드" },
+        {
+          name: "이지에어",
+          volume: 15,
+          memberPrice: 39000,
+          category: "블렌드",
+        },
+        {
+          name: "젠도크린",
+          volume: 15,
+          memberPrice: 42000,
+          category: "블렌드",
+        },
         { name: "치어", volume: 5, memberPrice: 39000, category: "블렌드" },
         { name: "콘솔", volume: 5, memberPrice: 64000, category: "블렌드" },
-        { name: "클리어리파이", volume: 15, memberPrice: 47000, category: "블렌드" },
+        {
+          name: "클리어리파이",
+          volume: 15,
+          memberPrice: 47000,
+          category: "블렌드",
+        },
         { name: "패션", volume: 5, memberPrice: 65000, category: "블렌드" },
-        { name: "패스트탠스", volume: 15, memberPrice: 49000, category: "블렌드" },
+        {
+          name: "패스트탠스",
+          volume: 15,
+          memberPrice: 49000,
+          category: "블렌드",
+        },
         { name: "포기브", volume: 5, memberPrice: 34000, category: "블렌드" },
-        { name: "퓨리파이", volume: 15, memberPrice: 34000, category: "블렌드" },
+        {
+          name: "퓨리파이",
+          volume: 15,
+          memberPrice: 34000,
+          category: "블렌드",
+        },
         { name: "피스필", volume: 5, memberPrice: 52000, category: "블렌드" },
-        { name: "테라쉴드", volume: 30, memberPrice: 31000, category: "블렌드" },
+        {
+          name: "테라쉴드",
+          volume: 30,
+          memberPrice: 31000,
+          category: "블렌드",
+        },
         { name: "앵커", volume: 5, memberPrice: 33000, category: "블렌드" },
         { name: "어센드", volume: 5, memberPrice: 31000, category: "블렌드" },
         { name: "얼라인", volume: 5, memberPrice: 31000, category: "블렌드" },
 
         // 터치 / 롤온 (Touch / Roll-on - 보통 10ml)
-        { name: "네롤리 터치", volume: 10, memberPrice: 78000, category: "터치" },
-        { name: "다이제스트젠 터치", volume: 10, memberPrice: 36000, category: "터치" },
-        { name: "라벤더 터치", volume: 10, memberPrice: 27000, category: "터치" },
+        {
+          name: "네롤리 터치",
+          volume: 10,
+          memberPrice: 78000,
+          category: "터치",
+        },
+        {
+          name: "다이제스트젠 터치",
+          volume: 10,
+          memberPrice: 36000,
+          category: "터치",
+        },
+        {
+          name: "라벤더 터치",
+          volume: 10,
+          memberPrice: 27000,
+          category: "터치",
+        },
         { name: "레스큐어", volume: 10, memberPrice: 27000, category: "터치" },
-        { name: "로즈 터치", volume: 10, memberPrice: 109000, category: "터치" },
+        {
+          name: "로즈 터치",
+          volume: 10,
+          memberPrice: 109000,
+          category: "터치",
+        },
         { name: "브레이브", volume: 10, memberPrice: 33000, category: "터치" },
         { name: "살루벨", volume: 10, memberPrice: 118000, category: "터치" },
         { name: "스테디", volume: 10, memberPrice: 27000, category: "터치" },
         { name: "스트롱거", volume: 10, memberPrice: 27000, category: "터치" },
         { name: "씽커", volume: 10, memberPrice: 28000, category: "터치" },
-        { name: "오레가노 터치", volume: 10, memberPrice: 30000, category: "터치" },
-        { name: "온가드 터치", volume: 10, memberPrice: 36000, category: "터치" },
-        { name: "위스퍼 터치", volume: 10, memberPrice: 44000, category: "터치" },
-        { name: "이지에어 터치", volume: 10, memberPrice: 27000, category: "터치" },
+        {
+          name: "오레가노 터치",
+          volume: 10,
+          memberPrice: 30000,
+          category: "터치",
+        },
+        {
+          name: "온가드 터치",
+          volume: 10,
+          memberPrice: 36000,
+          category: "터치",
+        },
+        {
+          name: "위스퍼 터치",
+          volume: 10,
+          memberPrice: 44000,
+          category: "터치",
+        },
+        {
+          name: "이지에어 터치",
+          volume: 10,
+          memberPrice: 27000,
+          category: "터치",
+        },
         { name: "인툰", volume: 10, memberPrice: 56000, category: "터치" },
-        { name: "자스민 터치", volume: 10, memberPrice: 68000, category: "터치" },
+        {
+          name: "자스민 터치",
+          volume: 10,
+          memberPrice: 68000,
+          category: "터치",
+        },
         { name: "카머", volume: 10, memberPrice: 31000, category: "터치" },
         { name: "클래리캄", volume: 10, memberPrice: 46000, category: "터치" },
-        { name: "티트리 터치", volume: 10, memberPrice: 25000, category: "터치" },
-        { name: "페퍼민트 터치", volume: 10, memberPrice: 27000, category: "터치" },
-        { name: "프랑킨센스 터치", volume: 10, memberPrice: 77000, category: "터치" },
+        {
+          name: "티트리 터치",
+          volume: 10,
+          memberPrice: 25000,
+          category: "터치",
+        },
+        {
+          name: "페퍼민트 터치",
+          volume: 10,
+          memberPrice: 27000,
+          category: "터치",
+        },
+        {
+          name: "프랑킨센스 터치",
+          volume: 10,
+          memberPrice: 77000,
+          category: "터치",
+        },
         { name: "호프 터치", volume: 10, memberPrice: 27000, category: "터치" },
 
         // 방향제 오일
-        { name: "라벤더 피스", volume: 15, memberPrice: 40000, category: "방향" },
-        { name: "레몬 디톡스", volume: 15, memberPrice: 20000, category: "방향" },
-        { name: "맑은숲 유칼립투스", volume: 15, memberPrice: 31000, category: "방향" },
-        { name: "스피어민트 프레시", volume: 15, memberPrice: 45000, category: "방향" },
-        { name: "에어 리페어", volume: 15, memberPrice: 47000, category: "방향" },
-        { name: "오렌지 해피", volume: 15, memberPrice: 17000, category: "방향" },
-        { name: "온가드 프로텍트", volume: 15, memberPrice: 52000, category: "방향" },
-        { name: "좋은꿈 세레니티", volume: 15, memberPrice: 56000, category: "방향" },
-        { name: "테라쉴드 아웃도어", volume: 15, memberPrice: 19000, category: "방향" },
-        { name: "페퍼민트 쿨링", volume: 15, memberPrice: 36000, category: "방향" },
-        { name: "편한숨 브래스", volume: 15, memberPrice: 39000, category: "방향" },
-        { name: "포레스트 배싱", volume: 15, memberPrice: 49000, category: "방향" },
+        {
+          name: "라벤더 피스",
+          volume: 15,
+          memberPrice: 40000,
+          category: "방향",
+        },
+        {
+          name: "레몬 디톡스",
+          volume: 15,
+          memberPrice: 20000,
+          category: "방향",
+        },
+        {
+          name: "맑은숲 유칼립투스",
+          volume: 15,
+          memberPrice: 31000,
+          category: "방향",
+        },
+        {
+          name: "스피어민트 프레시",
+          volume: 15,
+          memberPrice: 45000,
+          category: "방향",
+        },
+        {
+          name: "에어 리페어",
+          volume: 15,
+          memberPrice: 47000,
+          category: "방향",
+        },
+        {
+          name: "오렌지 해피",
+          volume: 15,
+          memberPrice: 17000,
+          category: "방향",
+        },
+        {
+          name: "온가드 프로텍트",
+          volume: 15,
+          memberPrice: 52000,
+          category: "방향",
+        },
+        {
+          name: "좋은꿈 세레니티",
+          volume: 15,
+          memberPrice: 56000,
+          category: "방향",
+        },
+        {
+          name: "테라쉴드 아웃도어",
+          volume: 15,
+          memberPrice: 19000,
+          category: "방향",
+        },
+        {
+          name: "페퍼민트 쿨링",
+          volume: 15,
+          memberPrice: 36000,
+          category: "방향",
+        },
+        {
+          name: "편한숨 브래스",
+          volume: 15,
+          memberPrice: 39000,
+          category: "방향",
+        },
+        {
+          name: "포레스트 배싱",
+          volume: 15,
+          memberPrice: 49000,
+          category: "방향",
+        },
 
         // 캐리어 / 한정판 오일
-        { name: "코코넛 오일", volume: 115, memberPrice: 19000, category: "캐리어" },
-        { name: "노던 이스케이프", volume: 15, memberPrice: 47000, category: "한정" },
+        {
+          name: "코코넛 오일",
+          volume: 115,
+          memberPrice: 19000,
+          category: "캐리어",
+        },
+        {
+          name: "노던 이스케이프",
+          volume: 15,
+          memberPrice: 47000,
+          category: "한정",
+        },
         { name: "발삼퍼", volume: 5, memberPrice: 21000, category: "한정" },
-        { name: "블랙 스프루스", volume: 5, memberPrice: 32000, category: "한정" },
-        { name: "툴시(홀리 바질)", volume: 5, memberPrice: 44000, category: "한정" },
+        {
+          name: "블랙 스프루스",
+          volume: 5,
+          memberPrice: 32000,
+          category: "한정",
+        },
+        {
+          name: "툴시(홀리 바질)",
+          volume: 5,
+          memberPrice: 44000,
+          category: "한정",
+        },
         { name: "휘게", volume: 15, memberPrice: 58000, category: "한정" },
-        { name: "스페니시 세이지", volume: 15, memberPrice: 44000, category: "한정" },
+        {
+          name: "스페니시 세이지",
+          volume: 15,
+          memberPrice: 44000,
+          category: "한정",
+        },
         { name: "블루탠시", volume: 5, memberPrice: 131000, category: "한정" },
-        { name: "다바나 터치", volume: 10, memberPrice: 49000, category: "한정" },
-        { name: "비커밍 터치", volume: 10, memberPrice: 43000, category: "한정" },
+        {
+          name: "다바나 터치",
+          volume: 10,
+          memberPrice: 49000,
+          category: "한정",
+        },
+        {
+          name: "비커밍 터치",
+          volume: 10,
+          memberPrice: 43000,
+          category: "한정",
+        },
         { name: "미르 터치", volume: 10, memberPrice: 62000, category: "한정" },
-        { name: "엔드리스 썸머", volume: 15, memberPrice: 52000, category: "한정" },
-        { name: "카멜리아 씨드", volume: 30, memberPrice: 23000, category: "한정" },
-        { name: "헬리크리섬 터치", volume: 10, memberPrice: 87000, category: "한정" },
+        {
+          name: "엔드리스 썸머",
+          volume: 15,
+          memberPrice: 52000,
+          category: "한정",
+        },
+        {
+          name: "카멜리아 씨드",
+          volume: 30,
+          memberPrice: 23000,
+          category: "한정",
+        },
+        {
+          name: "헬리크리섬 터치",
+          volume: 10,
+          memberPrice: 87000,
+          category: "한정",
+        },
       ];
 
       // 색상 팔레트 (레시피 분석 그래프 색상용)
@@ -842,7 +1186,7 @@
       ];
 
       // 2. 전역 애플리케이션 상태(State) 관리
-              let state = {
+      let state = {
         recipeItems: [], // 현재 레시피 테이블에 올라간 아이템 목록
         currentCategory: "all", // 검색 필터링용 탭
         searchQuery: "", // 검색 키워드
@@ -919,7 +1263,10 @@
       function decodeRecipePayload(encodedRecipe) {
         const legacySafeRecipe = encodedRecipe.replace(/ /g, "+");
         let base64 = legacySafeRecipe.replace(/-/g, "+").replace(/_/g, "/");
-        base64 = base64.padEnd(base64.length + ((4 - (base64.length % 4)) % 4), "=");
+        base64 = base64.padEnd(
+          base64.length + ((4 - (base64.length % 4)) % 4),
+          "=",
+        );
 
         return JSON.parse(decodeURIComponent(escape(atob(base64))));
       }
@@ -981,7 +1328,10 @@
           const preset = findPresetOil(recipeOil.name);
           if (!preset) return sum;
 
-          const dropsPerBottle = calculateDropsForVolume(preset.volume, baseDrops);
+          const dropsPerBottle = calculateDropsForVolume(
+            preset.volume,
+            baseDrops,
+          );
           return sum + (preset.memberPrice / dropsPerBottle) * recipeOil.drops;
         }, 0);
       }
@@ -992,8 +1342,13 @@
 
         container.innerHTML = "";
         RECOMMENDED_RECIPES.forEach((recipe) => {
-          const totalDrops = recipe.items.reduce((sum, item) => sum + item.drops, 0);
-          const estimatedCost = Math.round(estimateRecommendedRecipeCost(recipe));
+          const totalDrops = recipe.items.reduce(
+            (sum, item) => sum + item.drops,
+            0,
+          );
+          const estimatedCost = Math.round(
+            estimateRecommendedRecipeCost(recipe),
+          );
           const oilText = recipe.items
             .map((item) => `${item.name} ${item.drops}`)
             .join(" · ");
@@ -1054,11 +1409,19 @@
 
         if (mode === "append") {
           state.recipeItems = [...state.recipeItems, ...items];
-          showToast("plus", "indigo-600", `"${recipe.title}" 조합을 현재 레시피에 추가했습니다.`);
+          showToast(
+            "plus",
+            "indigo-600",
+            `"${recipe.title}" 조합을 현재 레시피에 추가했습니다.`,
+          );
         } else {
           document.getElementById("recipeNameInput").value = recipe.title;
           state.recipeItems = items;
-          showToast("sparkles", "indigo-600", `"${recipe.title}" 추천 레시피를 불러왔습니다.`);
+          showToast(
+            "sparkles",
+            "indigo-600",
+            `"${recipe.title}" 추천 레시피를 불러왔습니다.`,
+          );
         }
 
         calculateAndRender();
@@ -1195,10 +1558,10 @@
 
             const rowHtml = `
             <tr class="hover:bg-slate-50 transition-all">
-              <td class="py-3 px-4">
+              <td class="py-3 px-3 w-[190px] max-w-[190px]">
                 <div class="flex flex-col">
                   <span class="text-xs font-bold text-indigo-500 mb-0.5">[${item.category}]</span>
-                  <input type="text" value="${item.name}" onchange="handleFieldUpdate('${item.id}', 'name', this.value)" class="font-semibold text-slate-800 bg-transparent border-b border-transparent hover:border-slate-300 focus:border-indigo-500 focus:outline-none py-0.5">
+                  <input type="text" value="${item.name}" onchange="handleFieldUpdate('${item.id}', 'name', this.value)" class="w-full font-semibold text-slate-800 bg-transparent border-b border-transparent hover:border-slate-300 focus:border-indigo-500 focus:outline-none py-0.5">
                 </div>
               </td>
               <td class="py-3 px-2 text-center">
@@ -1222,7 +1585,7 @@
                   <span class="text-slate-400 text-[10px]">방울</span>
                 </div>
               </td>
-              <td class="py-3 px-2 text-right font-medium text-slate-500 text-xs">
+              <td class="py-3 px-2 text-right font-medium text-slate-500 text-xs whitespace-nowrap">
                 ${Math.round(pricePerDrop).toLocaleString()}원/방울
               </td>
               <td class="py-3 px-2 text-center">
@@ -1379,16 +1742,18 @@
         state.currentCategory = category;
 
         // 탭 액티브 스타일 클래스 변경
-        ["all", "싱글", "블렌드", "터치", "방향", "캐리어", "한정"].forEach((cat) => {
-          const tab = document.getElementById(`tab-${cat}`);
-          if (cat === category) {
-            tab.className =
-              "px-2.5 py-1.5 rounded-lg font-bold text-center bg-white text-indigo-700 shadow-sm transition-all";
-          } else {
-            tab.className =
-              "px-2.5 py-1.5 rounded-lg font-bold text-center text-slate-500 hover:text-indigo-600 transition-all";
-          }
-        });
+        ["all", "싱글", "블렌드", "터치", "방향", "캐리어", "한정"].forEach(
+          (cat) => {
+            const tab = document.getElementById(`tab-${cat}`);
+            if (cat === category) {
+              tab.className =
+                "px-2.5 py-1.5 rounded-lg font-bold text-center bg-white text-indigo-700 shadow-sm transition-all";
+            } else {
+              tab.className =
+                "px-2.5 py-1.5 rounded-lg font-bold text-center text-slate-500 hover:text-indigo-600 transition-all";
+            }
+          },
+        );
 
         renderOilDatabase();
       }
