@@ -1,5 +1,12 @@
 const QUIZZES = [
   {
+    id: "0",
+    file: "quiz0.txt",
+    title: "0번 문제",
+    description: "변수와 입출력 문제 풀기",
+    quizTitle: "파이썬 퀴즈-변수와 입출력",
+  },
+  {
     id: "1",
     file: "quiz1.txt",
     title: "1번 문제",
@@ -61,12 +68,5 @@ const QUIZZES = [
     title: "9번 문제",
     description: "반복구조 심화 문제 풀기",
     quizTitle: "파이썬 퀴즈-반복구조 심화",
-  },
-  {
-    id: "0",
-    file: "quiz0.txt",
-    title: "0번 문제",
-    description: "변수와 입출력 문제 풀기",
-    quizTitle: "파이썬 퀴즈-변수와 입출력",
   },
 ];
