@@ -1,0 +1,121 @@
+1
+print("python")
+===
+python
+
+2
+print(5)
+===
+5
+
+3
+print("co ding")
+===
+co ding
+
+4
+print("한글")
+===
+한글
+
+5
+print("나무"*3)
+===
+나무나무나무
+
+6
+print("2+5-1")
+===
+2+5-1
+
+7
+print("hi"*2)
+print("hello")
+===
+hihi
+hello
+
+8
+print(555)
+print("01"*3)
+===
+555
+010101
+
+9
+print("1+1")
+print(111*2)
+===
+1+1
+222
+
+10
+print("5+5"*2)
+print(5+5)
+===
+5+55+5
+10
+
+11
+a = 4
+print(a)
+===
+4
+
+12
+b = 10
+print("b")
+===
+b
+
+13
+n1 = input()   # 15 입력
+print(n1)
+===
+15
+
+14
+word = input()   # 파이썬 입력
+print(word)
+===
+파이썬
+
+15
+a = 10
+b = 20
+print(a+b)
+===
+30
+
+16
+r = input()   # P 입력
+print("R")
+===
+R
+
+17
+p = input()   # 0123 입력
+print(p)
+===
+0123
+
+18
+a1 = input()  # 50 입력
+a2 = input()  # 05 입력
+print(a1+a2)
+===
+5005
+
+19
+k = 30
+k = input()  # 40 입력
+print(k)
+===
+40
+
+20
+h1 = input()  # 치킨 입력
+h2 = input()  # pizza 입력
+print(h1+"h2")
+===
+치킨h2
