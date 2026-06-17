@@ -28,6 +28,16 @@ h1 {
   gap: 20px;
 }
 
+.download-section {
+  margin-top: 40px;
+}
+
+.section-title {
+  margin: 0 0 18px 0;
+  font-size: 24px;
+  text-align: center;
+}
+
 .card {
   background: #fff;
   border: 1px solid #ccc;
